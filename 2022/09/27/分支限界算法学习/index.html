@@ -1,0 +1,195 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="分支限界算法学习，分支限界算法的定义以及例子">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分支限界算法学习">
+<meta property="og:url" content="https://fengqianye.github.io/2022/09/27/%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="分支限界算法学习，分支限界算法的定义以及例子">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/78993b296ae849ef8b4e4efc347e9dda.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/56932d6f43c942bda17f48a597981bc8.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/63f5cabc1bff4a949572888e86acf7d7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0aba17899c204d8187515c81b99f0410.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/86cf470d5a7443298dacbefbc1613025.png#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3b6f9aef848146d49bf17895ddc1d301.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/be89760c77c94b7e990aa6979b758685.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5070e2f9ea2c47faab37ebcc761e473c.png#pic_center">
+<meta property="article:published_time" content="2022-09-27T13:20:59.000Z">
+<meta property="article:modified_time" content="2022-10-21T08:41:24.130Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="算法学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/78993b296ae849ef8b4e4efc347e9dda.png#pic_center"><title>分支限界算法学习 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/09/27/%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">分支限界算法学习</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-09-27</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-21</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">1.7k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">10分</span></span></div></header><div class="post-body">
+        <h1 id="分支限界法"   >
+          <a href="#分支限界法" class="heading-link"><i class="fas fa-link"></i></a><a href="#分支限界法" class="headerlink" title="分支限界法"></a>分支限界法</h1>
+      
+        <h2 id="分支限界法的前置概念"   >
+          <a href="#分支限界法的前置概念" class="heading-link"><i class="fas fa-link"></i></a><a href="#分支限界法的前置概念" class="headerlink" title="分支限界法的前置概念"></a>分支限界法的前置概念</h2>
+      
+        <h3 id="组合优化问题"   >
+          <a href="#组合优化问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#组合优化问题" class="headerlink" title="组合优化问题"></a>组合优化问题</h3>
+      <blockquote>
+<ul>
+<li>目标函数：极大化或者极小化</li>
+<li>约束条件：解满足的条件</li>
+<li>可行解：搜索空间满足约束条件的解</li>
+<li>最优解：使得目标函数达到极大（或极小）的可行解。</li>
+</ul>
+</blockquote>
+
+        <h3 id="代价函数"   >
+          <a href="#代价函数" class="heading-link"><i class="fas fa-link"></i></a><a href="#代价函数" class="headerlink" title="代价函数"></a>代价函数</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/78993b296ae849ef8b4e4efc347e9dda.png#pic_center"  alt="在这里插入图片描述">
+      <br>代价函数的计算能够事先估计以该结点为父节点的子树所得结果的最优结果的边界值。</p>
+
+        <h3 id="界"   >
+          <a href="#界" class="heading-link"><i class="fas fa-link"></i></a><a href="#界" class="headerlink" title="界"></a>界</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/56932d6f43c942bda17f48a597981bc8.png#pic_center"  alt="在这里插入图片描述">
+      <br>将一个更好的可行解作为新界的值。</p>
+
+        <h2 id="分支限界法的定义和思想"   >
+          <a href="#分支限界法的定义和思想" class="heading-link"><i class="fas fa-link"></i></a><a href="#分支限界法的定义和思想" class="headerlink" title="分支限界法的定义和思想"></a>分支限界法的定义和思想</h2>
+      
+        <h3 id="定义"   >
+          <a href="#定义" class="heading-link"><i class="fas fa-link"></i></a><a href="#定义" class="headerlink" title="定义"></a>定义</h3>
+      <p>分支限界法（branch and bound method）按广度优先策略搜索问题的解空间树，在搜索过程中，对待处理的节点根据限界函数估算目标函数的可能取值，从中选取使目标函数取得极值（极大或极小）的结点优先进行广度优先搜索，从而不断调整搜索方向，尽快找到问题的解。</p>
+
+        <h3 id="思想"   >
+          <a href="#思想" class="heading-link"><i class="fas fa-link"></i></a><a href="#思想" class="headerlink" title="思想"></a>思想</h3>
+      <p>分支限界法适合解决组合优化问题，首先要确定一个合理的代价函数，并根据代价函数确定目标函数的界，按照广度优先策略搜索问题的解空间树，在分直结点上依次扩展该结点的孩子结点，分别估算孩子结点的目标函数可能值，如果某孩子结点的目标函数可能超出目标函数的界，则将其丢弃；否则将其加入待处理结点表（简称PT表），依次从表PT中选取使目标函数取得极值的结点成为当前扩展结点，重复上述过程，直到得到最优解。也就是说，每个结点设置代价函数估计以该结点为父节点的子树所得结果的最优结果的边界值。把每个结点的代价函数的值与当前界的值比较，如果代价函数的值不优于界值，则剪枝，不再访问以该结点为父节点的子树，否则继续访问。以此加快搜索的速度。关键是如何在广度优先遍历中实现提前剪枝。</p>
+
+        <h2 id="分支限界法的实现"   >
+          <a href="#分支限界法的实现" class="heading-link"><i class="fas fa-link"></i></a><a href="#分支限界法的实现" class="headerlink" title="分支限界法的实现"></a>分支限界法的实现</h2>
+      
+        <h3 id="常见的两种分支限界法"   >
+          <a href="#常见的两种分支限界法" class="heading-link"><i class="fas fa-link"></i></a><a href="#常见的两种分支限界法" class="headerlink" title="常见的两种分支限界法"></a>常见的两种分支限界法</h3>
+      <p>分支限界法有两种不同的搜索空间树方式，分别为广度优先和最小耗费优先，它们对应两种不同的方法：</p>
+<blockquote>
+<ol>
+<li>队列式(FIFO)分支限界法<br>按照队列先进先出（FIFO）原则选取下一个结点为扩展结点。</li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li>优先队列式分支限界法</li>
+</ol>
+<ul>
+<li>按照优先队列中规定的优先级选取优先级最高的结点成为当前扩展结点。</li>
+<li>如果查找一个具有最小耗费的解：则活结点表可用小顶堆来建立，下一个扩展结点就是具有最小耗费的活结点</li>
+<li>如果希望搜索一个具有最大收益的解：则可用大顶堆来构造活结点表，下一个扩展结点是具有最大收益的活结点</li>
+</ul>
+</blockquote>
+
+        <h3 id="代码实现逻辑"   >
+          <a href="#代码实现逻辑" class="heading-link"><i class="fas fa-link"></i></a><a href="#代码实现逻辑" class="headerlink" title="代码实现逻辑"></a>代码实现逻辑</h3>
+      <p>队列实现分支限界的代码逻辑，利用队列实现广度优先遍历同时实现剪枝：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/63f5cabc1bff4a949572888e86acf7d7.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="分支限界法的例子"   >
+          <a href="#分支限界法的例子" class="heading-link"><i class="fas fa-link"></i></a><a href="#分支限界法的例子" class="headerlink" title="分支限界法的例子"></a>分支限界法的例子</h3>
+      <ul>
+<li>单源最短路径<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0aba17899c204d8187515c81b99f0410.png#pic_center"  alt="在这里插入图片描述">
+      <br>搜索树：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/86cf470d5a7443298dacbefbc1613025.png#pic_center"  alt="在这里插入图片描述">
+      </li>
+</ul>
+<blockquote>
+<p>算法逻辑：</p>
+<ol>
+<li>生成根节点的所有分支，全部入队列并记录路径</li>
+<li>选择路径最短的结点作为扩展结点</li>
+<li>逐个生成分支，判断该分支的路径是否小于记录的最短路径；</li>
+<li>若不小于，舍弃该分支，否则入队</li>
+<li>生成所有分支后，回到2；</li>
+<li>当队列为空时，算法结束。</li>
+</ol>
+</blockquote>
+<p>代码实现：</p>
+<figure class="highlight c"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//单源最短路径</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Graph</span>&#123;</span>	<span class="comment">//带权有向图</span></span><br><span class="line">private:</span><br><span class="line">    <span class="type">int</span> n;			<span class="comment">//顶点个数</span></span><br><span class="line">    <span class="type">int</span> **c;		<span class="comment">//邻接矩阵</span></span><br><span class="line">    <span class="type">int</span> *dist;		<span class="comment">//记录路径</span></span><br><span class="line">public:</span><br><span class="line">    <span class="type">void</span> <span class="title function_">shortestPaths</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">    Graph();         <span class="comment">//根据情况构造图</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MinHeapNode</span>&#123;</span>		<span class="comment">//最小堆的结点</span></span><br><span class="line">    friend Graph;</span><br><span class="line">private:</span><br><span class="line">    <span class="type">int</span> i;				<span class="comment">//结点对应的顶点编号</span></span><br><span class="line">    <span class="type">int</span> length;			<span class="comment">//结点记录的最短路径</span></span><br><span class="line">public:</span><br><span class="line">    <span class="type">int</span> <span class="title function_">getI</span><span class="params">()</span>&#123; <span class="keyword">return</span> i; &#125;</span><br><span class="line">    <span class="type">void</span> <span class="title function_">setI</span><span class="params">(<span class="type">int</span> i)</span>&#123; this-&gt;i = i; &#125;</span><br><span class="line">    <span class="type">int</span> <span class="title function_">getLength</span><span class="params">()</span>&#123; <span class="keyword">return</span> length; &#125;</span><br><span class="line">    <span class="type">void</span> <span class="title function_">setLength</span><span class="params">(<span class="type">int</span> length)</span>&#123; this-&gt;length = length; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MinHeap</span>&#123;</span>		<span class="comment">//最小堆(虽然叫堆，但其实并不是用堆实现的)</span></span><br><span class="line">    friend Graph;</span><br><span class="line">private:</span><br><span class="line">    <span class="type">int</span> length;			<span class="comment">//最小堆的长度，等同于顶点个数</span></span><br><span class="line">    MinHeapNode *nodes;		<span class="comment">//结点数组</span></span><br><span class="line">public:</span><br><span class="line">    MinHeap(<span class="type">int</span> n)</span><br><span class="line">    &#123;</span><br><span class="line">        this-&gt;length = n;</span><br><span class="line">        nodes = new MinHeapNode[n];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">void</span> <span class="title function_">deleteMin</span><span class="params">(MinHeapNode&amp;)</span>;	<span class="comment">//令当前节点出队列，并给出下一个扩展结点</span></span><br><span class="line">    <span class="type">void</span> <span class="title function_">insertNode</span><span class="params">(MinHeapNode N)</span>		<span class="comment">//结点入队列，将原结点的内容替换即可</span></span><br><span class="line">    &#123;</span><br><span class="line">        nodes[N.getI()].setI(N.getI());</span><br><span class="line">        nodes[N.getI()].setLength(N.getLength());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">bool</span> <span class="title function_">outOfBounds</span><span class="params">()</span>		<span class="comment">//检查队列为空</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; length;i++)</span><br><span class="line">            <span class="keyword">if</span>(nodes[i].getI() != <span class="number">-1</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">MinHeap::deleteMin</span><span class="params">(MinHeapNode &amp;E)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> j = E.getI();</span><br><span class="line">    nodes[j].setI(<span class="number">-1</span>);</span><br><span class="line">    nodes[j].setLength(<span class="number">-1</span>);		<span class="comment">//标记为出队列</span></span><br><span class="line">    <span class="type">int</span> tmp = INT_MAX;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; length;i++)&#123;		<span class="comment">//给出路径最短的结点作为扩展结点</span></span><br><span class="line">        <span class="keyword">if</span>(nodes[i].getI() != <span class="number">-1</span> &amp;&amp; nodes[i].getLength() &lt; tmp)&#123;</span><br><span class="line">            E.setI(i);</span><br><span class="line">            E.setLength(nodes[i].getLength());</span><br><span class="line">            tmp = nodes[i].getLength();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">Graph::shortestPaths</span><span class="params">(<span class="type">int</span> start)</span></span><br><span class="line">&#123;</span><br><span class="line">    MinHeap heap = MinHeap(n);	</span><br><span class="line">    MinHeapNode E = MinHeapNode();		<span class="comment">//别问，一开始还加了new，太久不写C++了</span></span><br><span class="line">    E.i = start;	</span><br><span class="line">    E.length = <span class="number">0</span>;</span><br><span class="line">    dist[start] = <span class="number">0</span>;	<span class="comment">//初始为源点V,对应编号start</span></span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j = <span class="number">0</span>;j &lt; n;j++)&#123;	<span class="comment">//检查所有邻接顶点</span></span><br><span class="line">            <span class="keyword">if</span>(c[E.i][j] != <span class="number">0</span>)&#123;		<span class="comment">//是否邻接</span></span><br><span class="line">                <span class="keyword">if</span>(E.length + c[E.i][j] &lt; dist[j])&#123;		<span class="comment">//是否满足限界，当前路径小于记录的最短路径</span></span><br><span class="line">                    dist[j] = E.length + c[E.i][j];		<span class="comment">//更新</span></span><br><span class="line">                    <span class="keyword">if</span>(<span class="comment">/*填入判断表达式*/</span>)&#123;          <span class="comment">//没有邻接顶点的点不入队，按情况调整，没有也可以，但会造成无效开销</span></span><br><span class="line">                        MinHeapNode N = MinHeapNode();	<span class="comment">//创建一个新的结点，并令其入队列</span></span><br><span class="line">                        N.i = j;</span><br><span class="line">                        N.length = dist[j];</span><br><span class="line">                        heap.insertNode(N);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(heap.outOfBounds())	<span class="comment">//队列为空，结束</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        heap.deleteMin(E);	<span class="comment">//该结点已经生成全部分支，出队列并取得下一扩展结点</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+<ul>
+<li>背包问题<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/3b6f9aef848146d49bf17895ddc1d301.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/be89760c77c94b7e990aa6979b758685.png"  alt="在这里插入图片描述">
+      <br>绿色为已经遍历的结点；红色为得到界的结点；蓝色是不满足限制条件被剪去的树枝；黄色为不优于界的树枝，搜素树：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5070e2f9ea2c47faab37ebcc761e473c.png#pic_center"  alt="在这里插入图片描述">
+      </li>
+</ul>
+
+        <h2 id="回溯法和分支限界法的区别"   >
+          <a href="#回溯法和分支限界法的区别" class="heading-link"><i class="fas fa-link"></i></a><a href="#回溯法和分支限界法的区别" class="headerlink" title="回溯法和分支限界法的区别"></a>回溯法和分支限界法的区别</h2>
+      <div class="table-container"><table>
+<thead>
+<tr>
+<th><strong>方法</strong></th>
+<th><strong>解空间搜索方式</strong></th>
+<th><strong>存储结点的数据结构</strong></th>
+<th><strong>结点存储性质</strong></th>
+<th><strong>常用应用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>回溯法</td>
+<td>深度优先</td>
+<td>栈</td>
+<td>活结点的所有可行结点被遍历后才能出栈</td>
+<td>找出满足条件的所有解</td>
+</tr>
+<tr>
+<td>分支限界法</td>
+<td>广度优先</td>
+<td>队列</td>
+<td>每个结点只有一次成为活结点机会</td>
+<td>找出满足条件的一个解或者特定意义的最优解</td>
+</tr>
+</tbody></table></div>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/09/27/%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/">https://fengqianye.github.io/2022/09/27/%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0/">算法学习</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2022/10/03/ES6%E6%89%A9%E5%B1%95/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">ES6扩展</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2022/09/26/backtrack/"><span class="paginator-prev__text">回溯法算法学习</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">
+          分支限界法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95%E7%9A%84%E5%89%8D%E7%BD%AE%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">
+          分支限界法的前置概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E5%90%88%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          组合优化问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E4%BB%B7%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.2.</span> <span class="toc-text">
+          代价函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%95%8C"><span class="toc-number">1.1.3.</span> <span class="toc-text">
+          界</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E6%80%9D%E6%83%B3"><span class="toc-number">1.2.</span> <span class="toc-text">
+          分支限界法的定义和思想</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89"><span class="toc-number">1.2.1.</span> <span class="toc-text">
+          定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%9D%E6%83%B3"><span class="toc-number">1.2.2.</span> <span class="toc-text">
+          思想</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.</span> <span class="toc-text">
+          分支限界法的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95"><span class="toc-number">1.3.1.</span> <span class="toc-text">
+          常见的两种分支限界法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E9%80%BB%E8%BE%91"><span class="toc-number">1.3.2.</span> <span class="toc-text">
+          代码实现逻辑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-number">1.3.3.</span> <span class="toc-text">
+          分支限界法的例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9E%E6%BA%AF%E6%B3%95%E5%92%8C%E5%88%86%E6%94%AF%E9%99%90%E7%95%8C%E6%B3%95%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">1.4.</span> <span class="toc-text">
+          回溯法和分支限界法的区别</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">22</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

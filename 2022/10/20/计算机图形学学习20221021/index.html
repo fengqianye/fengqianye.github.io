@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="屏幕，光栅化，像素，屏幕空间，视口变换，三角形 - 基础图元,光栅化,光栅化的问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221021">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221021/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="屏幕，光栅化，像素，屏幕空间，视口变换，三角形 - 基础图元,光栅化,光栅化的问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2b0c9f428cbb4db98dd15248ec60a6f4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fbe5f690e51249a4b9f44b34ad7dd9b7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7fbd5c4708584adda5b2d2a3b9ed3e0c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7151f2d74aa4426f9a2e343336d4852f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d2da770dde7f4b3da5372a30a399344e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d3650e3b383c4bfcb101d30ee498a2f9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/400abb2000e84da1aea7c0ccade71422.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4c52c71f2f2b4352ab5d8309e79a430b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4de6d25e4fd841a1974133423604b385.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/29409cf1dfa94c8d8ae8338554686381.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e1a0cde511e149d188479052c67677d1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/330ae81c5b3d4541ac26166d7c57803e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c7007ba58686427bb4d8f6691d30a1e5.png">
+<meta property="article:published_time" content="2022-10-20T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-21T08:39:51.572Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/2b0c9f428cbb4db98dd15248ec60a6f4.png"><title>计算机图形学学习20221021 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221021/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221021</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-20</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-21</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">1k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">5分</span></span></div></header><div class="post-body">
+        <h1 id="基本概念"   >
+          <a href="#基本概念" class="heading-link"><i class="fas fa-link"></i></a><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1>
+      
+        <h2 id="什么是屏幕（Screen）"   >
+          <a href="#什么是屏幕（Screen）" class="heading-link"><i class="fas fa-link"></i></a><a href="#什么是屏幕（Screen）" class="headerlink" title="什么是屏幕（Screen）"></a>什么是屏幕（Screen）</h2>
+      <p>屏幕是一个典型的光栅（raster）化的成像设备，在计算机图形学中把其当做一个二维数组，数组的大小被称为分辨率（resolution），每个元素是一个像素（Pixel）。</p>
+
+        <h2 id="光栅化（Rasterize）"   >
+          <a href="#光栅化（Rasterize）" class="heading-link"><i class="fas fa-link"></i></a><a href="#光栅化（Rasterize）" class="headerlink" title="光栅化（Rasterize）"></a>光栅化（Rasterize）</h2>
+      <p>光栅化（Rasterize）就是把东西画在屏幕上的过程。光栅（Raster）就是德语中的屏幕。</p>
+
+        <h2 id="像素（Pixel）"   >
+          <a href="#像素（Pixel）" class="heading-link"><i class="fas fa-link"></i></a><a href="#像素（Pixel）" class="headerlink" title="像素（Pixel）"></a>像素（Pixel）</h2>
+      <p>像素是图片单元（picture element）的简写，可以当作一个只带有一种颜色的小方块（颜色是rgb（红绿蓝0-255）的混合）。</p>
+
+        <h2 id="屏幕空间（Screen-Space）"   >
+          <a href="#屏幕空间（Screen-Space）" class="heading-link"><i class="fas fa-link"></i></a><a href="#屏幕空间（Screen-Space）" class="headerlink" title="屏幕空间（Screen-Space）"></a>屏幕空间（Screen-Space）</h2>
+      <p>屏幕空间就是在屏幕上建立一个坐标系（左下角是原点）。有以下一些约定：</p>
+<ul>
+<li>像素的坐标写成（x，y）的形式，例如下图蓝色坐标为（2,1）。</li>
+<li>像素坐标的范围是从（0，0）到（width-1，height-1）的。</li>
+<li>像素中心为（x+0.5,y+0.5）</li>
+<li>屏幕的覆盖范围是从（0，0）到（width，height）的。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2b0c9f428cbb4db98dd15248ec60a6f4.png"  alt="在这里插入图片描述">
+      </li>
+</ul>
+
+        <h1 id="视口变换-Viewport-transform"   >
+          <a href="#视口变换-Viewport-transform" class="heading-link"><i class="fas fa-link"></i></a><a href="#视口变换-Viewport-transform" class="headerlink" title="视口变换(Viewport transform)"></a>视口变换(Viewport transform)</h1>
+      <p>经过MVP变换，得到将所有物体都映射到了正则立方体中[-1,1]<sup>3</sup>，接下来进行视口变换将正则立方体映射到屏幕空间。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/fbe5f690e51249a4b9f44b34ad7dd9b7.png"  alt="在这里插入图片描述">
+      <br>具体过程为：</p>
+<ul>
+<li>忽略z</li>
+<li>将xy平面上的[-1,1]<sup>2</sup>（进行缩放和平移）成[0,width] X [1,height]</li>
+<li>计算出视口矩阵M<sub>viewport</sub><br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7fbd5c4708584adda5b2d2a3b9ed3e0c.png"  alt="在这里插入图片描述">
+      <br>经过视口变换，我们就确定了屏幕上一些边界点的坐标，接下来我们就要把轮廓内的东西画到屏幕上来进行显示。</li>
+</ul>
+
+        <h1 id="三角形-基础图元"   >
+          <a href="#三角形-基础图元" class="heading-link"><i class="fas fa-link"></i></a><a href="#三角形-基础图元" class="headerlink" title="三角形 - 基础图元"></a>三角形 - 基础图元</h1>
+      
+        <h2 id="三角形作为基础图元的好处"   >
+          <a href="#三角形作为基础图元的好处" class="heading-link"><i class="fas fa-link"></i></a><a href="#三角形作为基础图元的好处" class="headerlink" title="三角形作为基础图元的好处"></a>三角形作为基础图元的好处</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7151f2d74aa4426f9a2e343336d4852f.png"  alt="在这里插入图片描述">
+      </p>
+<ol>
+<li>三角形是最基础的多边形。</li>
+<li>任何其他的多边形可以拆成多个三角形。</li>
+<li>三角行肯定是个平面（planar）（四边形弯折一个顶点就可以在不同的平面中了）。</li>
+<li>内部容易区分（通过叉积可以快速判断点是否在三角形内，判断方法可以回顾第二节的内容）。</li>
+<li>方便不同的属性进行插值（从一个顶点到另一个顶点内部属性的变化）。</li>
+</ol>
+
+        <h2 id="使用像素表示三角形"   >
+          <a href="#使用像素表示三角形" class="heading-link"><i class="fas fa-link"></i></a><a href="#使用像素表示三角形" class="headerlink" title="使用像素表示三角形"></a>使用像素表示三角形</h2>
+      <p>经过MVP变换和视口变换就可以得到三角形三个顶点的坐标，接下来要将这个坐标转化为像素的集合。<br>这个过程的输入是三角形顶点投影到<strong>屏幕上的位置</strong>，输出是像素值的集合，如下图所示：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d2da770dde7f4b3da5372a30a399344e.png"  alt="在这里插入图片描述">
+      <br>根据上图我们很容易得到，三角形内部的点一定是要着色的，可是三角形边缘的点怎么办呢？<br>我们可以通过<strong>采样</strong>等方式来<strong>判断像素（中心点）与三角形的位置关系</strong>（在内还是在外？），进而判断边缘的点是否该被染色。</p>
+
+        <h1 id="光栅化"   >
+          <a href="#光栅化" class="heading-link"><i class="fas fa-link"></i></a><a href="#光栅化" class="headerlink" title="光栅化"></a>光栅化</h1>
+      
+        <h2 id="采样过程"   >
+          <a href="#采样过程" class="heading-link"><i class="fas fa-link"></i></a><a href="#采样过程" class="headerlink" title="采样过程"></a>采样过程</h2>
+      <p>对屏幕进行采样判断像素点的中心是否在三角形内部。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d3650e3b383c4bfcb101d30ee498a2f9.png"  alt="在这里插入图片描述">
+      <br>使用向量的叉乘判断点是否在三角形内部，如果在内部就染色，否则不染色，写出采样函数：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/400abb2000e84da1aea7c0ccade71422.png"  alt="在这里插入图片描述">
+      <br>变量屏幕上像素中心点，采样：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4c52c71f2f2b4352ab5d8309e79a430b.png"  alt="在这里插入图片描述">
+      <br>遍历屏幕上所有的像素点，十分浪费性能，引入包围盒。包围盒就是圈定三角形顶点的xy最小值和最大值的范围。<strong>我们不用遍历整个屏幕只要判断包围盒内的点即可</strong>。（AABB包围盒）</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4de6d25e4fd841a1974133423604b385.png"  alt="在这里插入图片描述">
+      <br>注意：<br>对于边界情况，可以做处理也可以不做处理。比如我们可以认为，下面的每种说法都是对的：</p>
+<ol>
+<li>图中的点在三角形1内</li>
+<li>图中的点在三角形2内</li>
+<li>图中的点在三角形1和三角形2内<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/29409cf1dfa94c8d8ae8338554686381.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h3 id="光栅化加速"   >
+          <a href="#光栅化加速" class="heading-link"><i class="fas fa-link"></i></a><a href="#光栅化加速" class="headerlink" title="光栅化加速"></a>光栅化加速</h3>
+      <p>相当于每一行设置一个包围盒，每一行只采样当前行包围盒内的像素。<br>适合比较窄的和旋转的三角形。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e1a0cde511e149d188479052c67677d1.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="光栅化的问题"   >
+          <a href="#光栅化的问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#光栅化的问题" class="headerlink" title="光栅化的问题"></a>光栅化的问题</h2>
+      
+        <h3 id="锯齿（Jaggie）或走样（Aliasing）"   >
+          <a href="#锯齿（Jaggie）或走样（Aliasing）" class="heading-link"><i class="fas fa-link"></i></a><a href="#锯齿（Jaggie）或走样（Aliasing）" class="headerlink" title="锯齿（Jaggie）或走样（Aliasing）"></a>锯齿（Jaggie）或走样（Aliasing）</h3>
+      <p>如图所示，直接栅格化后，边界并不像一个三角形。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/330ae81c5b3d4541ac26166d7c57803e.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c7007ba58686427bb4d8f6691d30a1e5.png"  alt="在这里插入图片描述">
+      </p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221021/">https://fengqianye.github.io/2022/10/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221021/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2022/10/21/qianLingHomework/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">千灵数据结构习题</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221020/"><span class="paginator-prev__text">计算机图形学学习20221020</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.</span> <span class="toc-text">
+          基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%B1%8F%E5%B9%95%EF%BC%88Screen%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">
+          什么是屏幕（Screen）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E6%A0%85%E5%8C%96%EF%BC%88Rasterize%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">
+          光栅化（Rasterize）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%83%8F%E7%B4%A0%EF%BC%88Pixel%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">
+          像素（Pixel）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B1%8F%E5%B9%95%E7%A9%BA%E9%97%B4%EF%BC%88Screen-Space%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">
+          屏幕空间（Screen-Space）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%86%E5%8F%A3%E5%8F%98%E6%8D%A2-Viewport-transform"><span class="toc-number">2.</span> <span class="toc-text">
+          视口变换(Viewport transform)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2-%E5%9F%BA%E7%A1%80%E5%9B%BE%E5%85%83"><span class="toc-number">3.</span> <span class="toc-text">
+          三角形 - 基础图元</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E4%BD%9C%E4%B8%BA%E5%9F%BA%E7%A1%80%E5%9B%BE%E5%85%83%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-number">3.1.</span> <span class="toc-text">
+          三角形作为基础图元的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%83%8F%E7%B4%A0%E8%A1%A8%E7%A4%BA%E4%B8%89%E8%A7%92%E5%BD%A2"><span class="toc-number">3.2.</span> <span class="toc-text">
+          使用像素表示三角形</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%89%E6%A0%85%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">
+          光栅化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E8%BF%87%E7%A8%8B"><span class="toc-number">4.1.</span> <span class="toc-text">
+          采样过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%89%E6%A0%85%E5%8C%96%E5%8A%A0%E9%80%9F"><span class="toc-number">4.1.1.</span> <span class="toc-text">
+          光栅化加速</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E6%A0%85%E5%8C%96%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">4.2.</span> <span class="toc-text">
+          光栅化的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%AF%E9%BD%BF%EF%BC%88Jaggie%EF%BC%89%E6%88%96%E8%B5%B0%E6%A0%B7%EF%BC%88Aliasing%EF%BC%89"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          锯齿（Jaggie）或走样（Aliasing）</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">22</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="Markdown 学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Markdown 代码语法学习记录">
+<meta property="og:url" content="https://fengqianye.github.io/2022/09/14/Other/hello/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="Markdown 学习">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fengqianye.github.io/assets/img/shiprock.jpg">
+<meta property="article:published_time" content="2022-09-14T08:44:21.000Z">
+<meta property="article:modified_time" content="2022-10-23T12:43:37.527Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="我的第一个bolg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://fengqianye.github.io/assets/img/shiprock.jpg"><title>Markdown 代码语法学习记录 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/09/14/Other/hello/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Markdown 代码语法学习记录</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-09-14</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-23</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">564</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">6分</span></span></div></header><div class="post-body"><p>官方文档：<span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://markdown.com.cn/basic-syntax/" >https://markdown.com.cn/basic-syntax/</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<!-- 要创建标题，请在单词或短语前面添加井号 (#) 。# 的数量代表了标题的级别。例如，添加三个 # 表示创建一个三级标题 (<h3>) (例如：### My Header)。 -->
+
+        <h1 id="Heading-level-1"   >
+          <a href="#Heading-level-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-1" class="headerlink" title="Heading level 1"></a>Heading level 1</h1>
+      
+        <h2 id="Heading-level-2"   >
+          <a href="#Heading-level-2" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-2" class="headerlink" title="Heading level 2"></a>Heading level 2</h2>
+      
+        <h3 id="Heading-level-3"   >
+          <a href="#Heading-level-3" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-3" class="headerlink" title="Heading level 3"></a>Heading level 3</h3>
+      
+        <h4 id="Heading-level-3-1"   >
+          <a href="#Heading-level-3-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-3-1" class="headerlink" title="Heading level 3"></a>Heading level 3</h4>
+      <!-- 还可以在文本下方添加任意数量的 == 号来标识一级标题，或者 -- 号来标识二级标题。 -->
+
+        <h1 id="Heading-level-1-1"   >
+          <a href="#Heading-level-1-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-1-1" class="headerlink" title="Heading level 1"></a>Heading level 1</h1>
+      
+        <h2 id="Heading-level-2-1"   >
+          <a href="#Heading-level-2-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#Heading-level-2-1" class="headerlink" title="Heading level 2"></a>Heading level 2</h2>
+      <p>要创建段落，请使用空白行将一行或多行文本进行分隔。</p>
+<p>I think I’ll use it to format all of my documents from now on.</p>
+<p>I think I’ll use it to format all of my documents from now on.</p>
+<p>I just love <strong>bold text</strong>.	</p>
+<p>Italicized text is the <em>cat’s meow</em>.</p>
+<p>This text is <em><strong>really important</strong></em>.</p>
+<blockquote>
+<p>Dorothy followed her through many of the beautiful rooms in her castle.</p>
+</blockquote>
+
+        <h1 id="块级引用"   >
+          <a href="#块级引用" class="heading-link"><i class="fas fa-link"></i></a><a href="#块级引用" class="headerlink" title="块级引用"></a>块级引用</h1>
+      <blockquote>
+<p>Dorothy followed her through many of the beautiful rooms in her castle.</p>
+<p>The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</p>
+</blockquote>
+<blockquote>
+<p>Dorothy followed her through many of the beautiful rooms in her castle.</p>
+<blockquote>
+<p>The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.</p>
+</blockquote>
+</blockquote>
+<blockquote>
+
+        <h2 id="The-quarterly-results-look-great"   >
+          <a href="#The-quarterly-results-look-great" class="heading-link"><i class="fas fa-link"></i></a><a href="#The-quarterly-results-look-great" class="headerlink" title="The quarterly results look great!"></a>The quarterly results look great!</h2>
+      <ul>
+<li>Revenue was off the chart.</li>
+<li>Profits were higher than ever.</li>
+</ul>
+<p> <em>Everything</em> is going according to <strong>plan</strong>.</p>
+</blockquote>
+<ol>
+<li>First item</li>
+<li>Second item</li>
+<li>Third item</li>
+<li>Fourth item</li>
+<li>First item</li>
+<li>Second item</li>
+<li>Third item<ol>
+<li>Indented item</li>
+<li>Indented item</li>
+</ol>
+</li>
+<li>Fourth item</li>
+</ol>
+<ul>
+<li>First item</li>
+<li>Second item</li>
+<li>Third item<ul>
+<li>Indented item</li>
+<li>Indented item</li>
+</ul>
+</li>
+<li>Fourth item</li>
+</ul>
+<ul>
+<li><p>This is the first list item.</p>
+</li>
+<li><p>Here’s the second list item.</p>
+<blockquote>
+<p>A blockquote would look great below the second list item.</p>
+</blockquote>
+</li>
+<li><p>And here’s the third list item.</p>
+</li>
+</ul>
+<p>At the command prompt, type <code>nano</code>.</p>
+<p>这是一个链接 <span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://markdown.com.cn/" >Markdown语法</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span>。</p>
+<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://markdown.com.cn/" >https://markdown.com.cn</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span><br><span class="exturl"><a class="exturl__link"   href="mailto:&#x66;&#x61;&#107;&#101;&#64;&#101;&#120;&#x61;&#x6d;&#112;&#x6c;&#101;&#x2e;&#x63;&#111;&#109;" >&#x66;&#x61;&#107;&#101;&#64;&#101;&#120;&#x61;&#x6d;&#112;&#x6c;&#101;&#x2e;&#x63;&#111;&#109;</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p>I love supporting the <strong><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://eff.org/" >EFF</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></strong>.<br>This is the <em><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="https://www.markdownguide.org/" >Markdown Guide</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></em>.<br>See the section on <a href="#code"><code>code</code></a></p>
+<p><a target="_blank" rel="noopener" href="https://markdown.com.cn/">
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="/assets/img/shiprock.jpg"  alt="沙漠中的岩石图片" title="Shiprock">
+      </a></p>
+<p>* Without the backslash, this would be a bullet in an unordered list.</p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>一个普通标题</th>
+<th>一个普通标题</th>
+<th>一个普通标题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>短文本</td>
+<td>中等文本</td>
+<td>稍微长一点的文本</td>
+</tr>
+<tr>
+<td>稍微长一点的文本</td>
+<td>短文本</td>
+<td>中等文本</td>
+</tr>
+</tbody></table></div>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th align="left">Syntax</th>
+<th align="center">Description</th>
+<th align="right">Test Text</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Header</td>
+<td align="center">Title</td>
+<td align="right">Here’s this</td>
+</tr>
+<tr>
+<td align="left">Paragraph</td>
+<td align="center">Text</td>
+<td align="right">And more</td>
+</tr>
+</tbody></table></div>
+<figure class="highlight json"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;firstName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;John&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;lastName&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Smith&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span> <span class="number">25</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></div></figure>
+
+<p>Here’s a simple footnote,[^1] and here’s a longer one.[^bignote]</p>
+<p>[^1]: This is the first footnote.</p>
+<p>[^bignote]: Here’s one with multiple paragraphs and code.</p>
+<pre><code>Indent paragraphs to include them in the footnote.
+
+`&#123; my code &#125;`
+
+Add as many paragraphs as you like.
+</code></pre>
+<dl><dt>First Term</dt><dd>This is the definition of the first term.</dd></dl><dl><dt>Second Term<br>: This is one definition of the second term.</dt><dd>This is another definition of the second term.</dd></dl><p><del>世界是平坦的。</del> 我们现在知道世界是圆的。</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> Write the press release</li>
+<li><input disabled="" type="checkbox"> Update the website</li>
+<li><input disabled="" type="checkbox"> Contact the media</li>
+</ul>
+<p>去露营了！ :tent: 很快回来。</p>
+<p>真好笑！ :joy:</p>
+<p><span class="exturl"><a class="exturl__link"   target="_blank" rel="noopener" href="http://www.example.com/" >http://www.example.com</a><span class="exturl__icon"><i class="fas fa-external-link-alt"></i></span></span></p>
+<p><code>http://www.example.com</code></p>
+<figure class="highlight javascript"><div class="table-container"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getQueryString</span>(<span class="params">name</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> reg = <span class="keyword">new</span> <span class="title class_">RegExp</span>(<span class="string">&quot;(^|&amp;)&quot;</span> + name + <span class="string">&quot;=([^&amp;]*)(&amp;|$)&quot;</span>, <span class="string">&quot;i&quot;</span>);</span><br><span class="line">    <span class="keyword">let</span> r = <span class="variable language_">window</span>.<span class="property">location</span>.<span class="property">search</span>.<span class="title function_">substr</span>(<span class="number">1</span>).<span class="title function_">match</span>(reg);</span><br><span class="line">    <span class="keyword">if</span> (r != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">decodeURIComponent</span>(r[<span class="number">2</span>]);</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></div></figure>
+
+
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/09/14/Other/hello/">https://fengqianye.github.io/2022/09/14/Other/hello/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E6%88%91%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AAbolg/">我的第一个bolg</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2022/09/20/Vue/Vue2.x/vueLearn/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">vue2.x学习笔记20220921</span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Heading-level-1"><span class="toc-number">1.</span> <span class="toc-text">
+          Heading level 1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Heading-level-2"><span class="toc-number">1.1.</span> <span class="toc-text">
+          Heading level 2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Heading-level-3"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          Heading level 3</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Heading-level-3-1"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">
+          Heading level 3</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Heading-level-1-1"><span class="toc-number">2.</span> <span class="toc-text">
+          Heading level 1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Heading-level-2-1"><span class="toc-number">2.1.</span> <span class="toc-text">
+          Heading level 2</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9D%97%E7%BA%A7%E5%BC%95%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">
+          块级引用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#The-quarterly-results-look-great"><span class="toc-number">3.1.</span> <span class="toc-text">
+          The quarterly results look great!</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">23</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

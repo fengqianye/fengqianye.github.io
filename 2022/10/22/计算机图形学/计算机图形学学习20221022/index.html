@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="Artifacts 瑕疵，频率方面的基础知识，傅里叶变换，卷积 ，从频率的角度看采样，减少走样的方法,深度缓存 Z-Buffer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221022">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221022/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="Artifacts 瑕疵，频率方面的基础知识，傅里叶变换，卷积 ，从频率的角度看采样，减少走样的方法,深度缓存 Z-Buffer">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5ba434cb247a4793a4c0151492dc2ac7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3cdced60f7bc4528942b78b0a9dee44c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b825ed96a5704a168cc71317e7f55859.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/42577e383c014d73bdad4e38c2818758.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/efed1671329e45bd8fb6fa0a26c196ed.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1c26281946fa436f9e69d620afb5e92c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8cbde94fc07f4afaa7581f607ecbfac2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0e78e27d78af434ea2b9f4eb9c5d501d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ad5819f79f4f48df932f049ba58b77a2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/80fdc0408dc745bfad3abf1ceaa77d32.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8740c2dc7a8e4adabf9ad428ab102ccc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c954fc5764f44d08aee3e4ba5c76902f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ebbd347504e94b26ab088e093c8617b1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/46b9235f9def439abcaf466cce332202.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/47651300885d487a8f4173252ab9eddc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/adf96468ca554558a4f0f71bdaad39bc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7a58568e22964df68e52cc5eeb61f680.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0335006f306b4fd4bc2429ca9cc63a17.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c87d5dfacbc143d78ad37038cbb9f397.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/37181ff1e0804f61bbcde5abcea56739.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1b8f2672dc294f66ae724cfd0d01894a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/be250a31f1394e75ac9ffefcf85da5f1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b7c53fc15884df4b8218c5fe8fe26db.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/76dee1d6d7ff460a8a1dc6f0d5ef2de2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e03f9460ce3b454282293db63be6f432.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d8bdc98d296c4ffa8614d15d2617f57f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/934b6f584c9b4b2887b0df312a62c85c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c7060de842ff436d8d07b1497a50d202.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/551f4b8483514d7783866ad5ccc93d01.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6fa876c4df2c45e2acb8cb29b19a6d61.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4d14740ba9034203a3f9f6edff992d0a.png">
+<meta property="article:published_time" content="2022-10-22T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-21T08:39:37.341Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/5ba434cb247a4793a4c0151492dc2ac7.png"><title>计算机图形学学习20221022 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221022/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221022</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-22</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-21</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">1.9k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">10分</span></span></div></header><div class="post-body">
+        <h1 id="Artifacts-瑕疵"   >
+          <a href="#Artifacts-瑕疵" class="heading-link"><i class="fas fa-link"></i></a><a href="#Artifacts-瑕疵" class="headerlink" title="Artifacts 瑕疵"></a>Artifacts 瑕疵</h1>
+      <p>在计算机图形学中Artifacts（瑕疵）指的是Errors &#x2F; Mistakes &#x2F; Inaccuracies</p>
+
+        <h2 id="采样产生的Artifacts"   >
+          <a href="#采样产生的Artifacts" class="heading-link"><i class="fas fa-link"></i></a><a href="#采样产生的Artifacts" class="headerlink" title="采样产生的Artifacts"></a>采样产生的Artifacts</h2>
+      
+        <h3 id="锯齿"   >
+          <a href="#锯齿" class="heading-link"><i class="fas fa-link"></i></a><a href="#锯齿" class="headerlink" title="锯齿"></a>锯齿</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5ba434cb247a4793a4c0151492dc2ac7.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="摩尔纹"   >
+          <a href="#摩尔纹" class="heading-link"><i class="fas fa-link"></i></a><a href="#摩尔纹" class="headerlink" title="摩尔纹"></a>摩尔纹</h3>
+      <p>Moire Pattterns（去掉图像的奇数行和奇数列）—— 由欠采样undersampling造成<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/3cdced60f7bc4528942b78b0a9dee44c.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="产生Artifacts-的原因"   >
+          <a href="#产生Artifacts-的原因" class="heading-link"><i class="fas fa-link"></i></a><a href="#产生Artifacts-的原因" class="headerlink" title="产生Artifacts 的原因"></a>产生Artifacts 的原因</h3>
+      <p>很多Artifact产生的原因是信号变换太快而采样太慢</p>
+
+        <h3 id="一种反走样的方法-——-在采样之前做模糊（滤波）"   >
+          <a href="#一种反走样的方法-——-在采样之前做模糊（滤波）" class="heading-link"><i class="fas fa-link"></i></a><a href="#一种反走样的方法-——-在采样之前做模糊（滤波）" class="headerlink" title="一种反走样的方法 —— 在采样之前做模糊（滤波）"></a>一种反走样的方法 —— 在采样之前做模糊（滤波）</h3>
+      <p>对原始的信号做模糊（滤波）再进行采样即可进行反走样。（注意：<strong>顺序不能变，先采样再模糊无法反走样</strong>）<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b825ed96a5704a168cc71317e7f55859.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="频率方面的基础知识"   >
+          <a href="#频率方面的基础知识" class="heading-link"><i class="fas fa-link"></i></a><a href="#频率方面的基础知识" class="headerlink" title="频率方面的基础知识"></a>频率方面的基础知识</h1>
+      
+        <h2 id="频域-Frequency-Domain"   >
+          <a href="#频域-Frequency-Domain" class="heading-link"><i class="fas fa-link"></i></a><a href="#频域-Frequency-Domain" class="headerlink" title="频域 Frequency Domain"></a>频域 Frequency Domain</h2>
+      <p>频域是描述信号在频率方面特性时用到的一种坐标系。 在电子学，控制系统工程和统计学中，频域图显示了在一个频率范围内每个给定频带内的信号量 。</p>
+
+        <h2 id="频率和周期"   >
+          <a href="#频率和周期" class="heading-link"><i class="fas fa-link"></i></a><a href="#频率和周期" class="headerlink" title="频率和周期"></a>频率和周期</h2>
+      <p>频率是f，周期是T。<br>频率越快，函数变化越快，如下图所示。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/42577e383c014d73bdad4e38c2818758.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="傅里叶变换"   >
+          <a href="#傅里叶变换" class="heading-link"><i class="fas fa-link"></i></a><a href="#傅里叶变换" class="headerlink" title="傅里叶变换"></a>傅里叶变换</h2>
+      
+        <h3 id="傅里叶级数展开"   >
+          <a href="#傅里叶级数展开" class="heading-link"><i class="fas fa-link"></i></a><a href="#傅里叶级数展开" class="headerlink" title="傅里叶级数展开"></a>傅里叶级数展开</h3>
+      <p>一切函数都可以写成<strong>一系列正弦函数和余弦函数的线性组合与一个常数项</strong>。任何函数分解为频率从低到高的若干函数。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/efed1671329e45bd8fb6fa0a26c196ed.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="傅里叶变换-1"   >
+          <a href="#傅里叶变换-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#傅里叶变换-1" class="headerlink" title="傅里叶变换"></a>傅里叶变换</h3>
+      <p>下面展示了傅里叶变换和逆傅里叶变换。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1c26281946fa436f9e69d620afb5e92c.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="从频率图像上来分析走样"   >
+          <a href="#从频率图像上来分析走样" class="heading-link"><i class="fas fa-link"></i></a><a href="#从频率图像上来分析走样" class="headerlink" title="从频率图像上来分析走样"></a>从频率图像上来分析走样</h2>
+      <p>频率越高的函数，采样回复到原函数的效果越差。即：高频率需要更快的采样。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8cbde94fc07f4afaa7581f607ecbfac2.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0e78e27d78af434ea2b9f4eb9c5d501d.png"  alt="在这里插入图片描述">
+      <br>走样：从频率分析角度定义走样：同样的采样方法采样两种频率的函数，但是得出的结果无法区分。</p>
+
+        <h1 id="滤波"   >
+          <a href="#滤波" class="heading-link"><i class="fas fa-link"></i></a><a href="#滤波" class="headerlink" title="滤波"></a>滤波</h1>
+      <p>（频率角度上）滤波就是去掉一系列的频率。</p>
+
+        <h2 id="傅里叶变化的作用"   >
+          <a href="#傅里叶变化的作用" class="heading-link"><i class="fas fa-link"></i></a><a href="#傅里叶变化的作用" class="headerlink" title="傅里叶变化的作用"></a>傅里叶变化的作用</h2>
+      <p>傅里叶变换可以把图像从时域变到频域。对下左图进行傅里叶变换，得到下右图。下右图中，<strong>中心是低频区域，向外延伸，频率越来越高，为高频区域</strong>。<strong>亮度代表信息密度</strong>，区域越亮表示信息越集中，下图表示图片的大多数信息都处于低频。右下图右成为频谱。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/ad5819f79f4f48df932f049ba58b77a2.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="高通滤波（High-pass-filter）"   >
+          <a href="#高通滤波（High-pass-filter）" class="heading-link"><i class="fas fa-link"></i></a><a href="#高通滤波（High-pass-filter）" class="headerlink" title="高通滤波（High-pass filter）"></a>高通滤波（High-pass filter）</h2>
+      <p>消除低频的信号，只让高频信号可以通过，再使用逆傅里叶变换得到图像。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/80fdc0408dc745bfad3abf1ceaa77d32.png"  alt="在这里插入图片描述">
+      <br>边界的特点：图像中发生突变的位置（颜色差的很多）。对应信号变换特别大，频率大，所有高通滤波器显示边界。</p>
+
+        <h2 id="低通滤波-x2F-模糊（Low-pass-filter-x2F-Blur）"   >
+          <a href="#低通滤波-x2F-模糊（Low-pass-filter-x2F-Blur）" class="heading-link"><i class="fas fa-link"></i></a><a href="#低通滤波-x2F-模糊（Low-pass-filter-x2F-Blur）" class="headerlink" title="低通滤波&#x2F;模糊（Low-pass filter&#x2F;Blur）"></a>低通滤波&#x2F;模糊（Low-pass filter&#x2F;Blur）</h2>
+      <p>消除高频的信号，只让低频信号可以通过，然后进行逆傅里叶变换。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8740c2dc7a8e4adabf9ad428ab102ccc.png"  alt="在这里插入图片描述">
+      <br>低筒滤波器消除边界，让图片变得模糊。</p>
+
+        <h2 id="带通滤波（Band-pass-filter）"   >
+          <a href="#带通滤波（Band-pass-filter）" class="heading-link"><i class="fas fa-link"></i></a><a href="#带通滤波（Band-pass-filter）" class="headerlink" title="带通滤波（Band-pass filter）"></a>带通滤波（Band-pass filter）</h2>
+      <p>去掉高频和低频的信息，然后进行逆傅里叶变换。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c954fc5764f44d08aee3e4ba5c76902f.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="卷积-Convolution"   >
+          <a href="#卷积-Convolution" class="heading-link"><i class="fas fa-link"></i></a><a href="#卷积-Convolution" class="headerlink" title="卷积 Convolution"></a>卷积 Convolution</h1>
+      <p>滤波 Filtering &#x3D; 卷积 Convolution （&#x3D; 平均 Averaging）<br>卷积是多个变量在某范围内相乘后求和的结果。<br>简单理解：有一个滑动窗口（滤波器），窗口的每个格子有权重，将这个窗口在信号上从左向右滑动做点乘。如下图所示。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/ebbd347504e94b26ab088e093c8617b1.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="卷积定理-Convolution-Theorem"   >
+          <a href="#卷积定理-Convolution-Theorem" class="heading-link"><i class="fas fa-link"></i></a><a href="#卷积定理-Convolution-Theorem" class="headerlink" title="卷积定理 Convolution Theorem"></a>卷积定理 Convolution Theorem</h2>
+      <p>卷积定理指出，函数卷积的傅立叶变换是函数傅立叶变换的乘积。<br>具体分为时域卷积定理和频域卷积定理，两者具有对偶关系。</p>
+
+        <h2 id="卷积定理的应用"   >
+          <a href="#卷积定理的应用" class="heading-link"><i class="fas fa-link"></i></a><a href="#卷积定理的应用" class="headerlink" title="卷积定理的应用"></a>卷积定理的应用</h2>
+      <p>如下图所示上面一行图片是时域的卷积(*是卷积操作）下面一行图片是频域的乘积。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/46b9235f9def439abcaf466cce332202.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="卷积中的低通滤波器"   >
+          <a href="#卷积中的低通滤波器" class="heading-link"><i class="fas fa-link"></i></a><a href="#卷积中的低通滤波器" class="headerlink" title="卷积中的低通滤波器"></a>卷积中的低通滤波器</h2>
+      <p>下面盒子形状的滤波器（Box Filter）就是低通滤波器。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/47651300885d487a8f4173252ab9eddc.png"  alt="在这里插入图片描述">
+      <br>乘上1&#x2F;9是为了卷积后的图片颜色与原来基本一致，否则图片就太亮了（归一化）。</p>
+
+        <h2 id="卷积核大小与频率的关系"   >
+          <a href="#卷积核大小与频率的关系" class="heading-link"><i class="fas fa-link"></i></a><a href="#卷积核大小与频率的关系" class="headerlink" title="卷积核大小与频率的关系"></a>卷积核大小与频率的关系</h2>
+      <p>越小的box，留下频率种类越多。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/adf96468ca554558a4f0f71bdaad39bc.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7a58568e22964df68e52cc5eeb61f680.png"  alt="在这里插入图片描述">
+      <br>越大的box，留下越低的频率，结果更加模糊。</p>
+
+        <h1 id="从频率的角度看采样"   >
+          <a href="#从频率的角度看采样" class="heading-link"><i class="fas fa-link"></i></a><a href="#从频率的角度看采样" class="headerlink" title="从频率的角度看采样"></a>从频率的角度看采样</h1>
+      <p>采样就是重复频域上的内容。</p>
+
+        <h2 id="冲激函数"   >
+          <a href="#冲激函数" class="heading-link"><i class="fas fa-link"></i></a><a href="#冲激函数" class="headerlink" title="冲激函数"></a>冲激函数</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0335006f306b4fd4bc2429ca9cc63a17.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="获得采样（与冲激函数相乘）"   >
+          <a href="#获得采样（与冲激函数相乘）" class="heading-link"><i class="fas fa-link"></i></a><a href="#获得采样（与冲激函数相乘）" class="headerlink" title="获得采样（与冲激函数相乘）"></a>获得采样（与冲激函数相乘）</h2>
+      <p>对于原始信号a，让它与冲激函数相乘，就可以得到采样的结果。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c87d5dfacbc143d78ad37038cbb9f397.png"  alt="在这里插入图片描述">
+      <br><strong>采样就是重复原始信号的频谱。</strong>采样就是将原始信号粘贴了一份。</p>
+
+        <h2 id="走样-x3D-频谱在搬移后出现了混合-Aliasing-x3D-Mixed-Frequency-Contents"   >
+          <a href="#走样-x3D-频谱在搬移后出现了混合-Aliasing-x3D-Mixed-Frequency-Contents" class="heading-link"><i class="fas fa-link"></i></a><a href="#走样-x3D-频谱在搬移后出现了混合-Aliasing-x3D-Mixed-Frequency-Contents" class="headerlink" title="走样 &#x3D; 频谱在搬移后出现了混合 Aliasing&#x3D;Mixed Frequency Contents"></a>走样 &#x3D; 频谱在搬移后出现了混合 Aliasing&#x3D;Mixed Frequency Contents</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/37181ff1e0804f61bbcde5abcea56739.png"  alt="在这里插入图片描述">
+      <br><strong>走样的原因是：在频谱的角度，原始信号在复制粘贴时出现了信号的重叠。</strong></p>
+
+        <h1 id="减少走样的方法"   >
+          <a href="#减少走样的方法" class="heading-link"><i class="fas fa-link"></i></a><a href="#减少走样的方法" class="headerlink" title="减少走样的方法"></a>减少走样的方法</h1>
+      
+        <h2 id="增加采样率"   >
+          <a href="#增加采样率" class="heading-link"><i class="fas fa-link"></i></a><a href="#增加采样率" class="headerlink" title="增加采样率"></a>增加采样率</h2>
+      <p>可以使用高分辨率的显示器、传感器、帧缓冲器。</p>
+
+        <h2 id="进行反走样"   >
+          <a href="#进行反走样" class="heading-link"><i class="fas fa-link"></i></a><a href="#进行反走样" class="headerlink" title="进行反走样"></a>进行反走样</h2>
+      <p>不是通过提高分辨率抗锯齿。<br>反走样简单来说就是：在对频谱重复之前，<strong>先让频谱更窄，减少信号的重叠</strong>。即先<strong>去掉一些的高频信息</strong>，然后再采样。这就解释了为什么模糊一个图像后采样能够抗走样。，如下图所示。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1b8f2672dc294f66ae724cfd0d01894a.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="如何模糊三角形—通过在像素区域平均来反走样"   >
+          <a href="#如何模糊三角形—通过在像素区域平均来反走样" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何模糊三角形—通过在像素区域平均来反走样" class="headerlink" title="如何模糊三角形—通过在像素区域平均来反走样"></a>如何模糊三角形—通过在像素区域平均来反走样</h2>
+      <p>使用一个低通滤波器，针对每个像素做卷积操作，然后对每个像素中心进行采样。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/be250a31f1394e75ac9ffefcf85da5f1.png"  alt="在这里插入图片描述">
+      <br>像素区域的亮度等于覆盖的图案覆盖这个像素的面积（即把像素内部的值平均起来）<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8b7c53fc15884df4b8218c5fe8fe26db.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="多重采样-Antialiasing-By-Supersampling（MSAA）"   >
+          <a href="#多重采样-Antialiasing-By-Supersampling（MSAA）" class="heading-link"><i class="fas fa-link"></i></a><a href="#多重采样-Antialiasing-By-Supersampling（MSAA）" class="headerlink" title="多重采样 Antialiasing By Supersampling（MSAA）"></a>多重采样 Antialiasing By Supersampling（MSAA）</h2>
+      <p>我们通过在一个像素内划分出更多的中心点来用更多的采用点进行反走样，将一个划分多个像素，<strong>判断这些更小的像素点是否在三角形内部，统计在三角形内部小像素点的个数判断覆盖率</strong>，<strong>但注意这只是反走样的近似，并不能真正解决反走样问题</strong>。</p>
+
+        <h3 id="超采样-Supersampling"   >
+          <a href="#超采样-Supersampling" class="heading-link"><i class="fas fa-link"></i></a><a href="#超采样-Supersampling" class="headerlink" title="超采样 Supersampling"></a>超采样 Supersampling</h3>
+      <p>第一步：对每个像素划分N × N的采样点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/76dee1d6d7ff460a8a1dc6f0d5ef2de2.png"  alt="在这里插入图片描述">
+      </p>
+<p>第二步：在每个像素里对这个N × N的采样点做平均。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e03f9460ce3b454282293db63be6f432.png"  alt="在这里插入图片描述">
+      </p>
+<p>结果：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d8bdc98d296c4ffa8614d15d2617f57f.png"  alt="在这里插入图片描述">
+      <br>抗锯齿了：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/934b6f584c9b4b2887b0df312a62c85c.png"  alt="在这里插入图片描述">
+      <br>这种方法增大了计算量实现抗锯齿。</p>
+
+        <h2 id="其他抗锯齿的方法"   >
+          <a href="#其他抗锯齿的方法" class="heading-link"><i class="fas fa-link"></i></a><a href="#其他抗锯齿的方法" class="headerlink" title="其他抗锯齿的方法"></a>其他抗锯齿的方法</h2>
+      <p>FXAA（Fast Approxiamate AA）：先获得有锯齿的图，然后找到边界，然后将有锯齿的边界替换成没有锯齿的边界。<br>TAA（Temporal AA）：复用上一帧感知到的结果，相当于把MSAA的样本分布到时间上，然后不对当前这一帧引入额外的操作。</p>
+
+        <h1 id="超分辨率问题-Super-resolution-x2F-super-sampling"   >
+          <a href="#超分辨率问题-Super-resolution-x2F-super-sampling" class="heading-link"><i class="fas fa-link"></i></a><a href="#超分辨率问题-Super-resolution-x2F-super-sampling" class="headerlink" title="超分辨率问题 Super resolution &#x2F; super sampling"></a>超分辨率问题 Super resolution &#x2F; super sampling</h1>
+      <ul>
+<li>超分辨率就是从低分辨率到高分辨率（比如把256 × 256图片拉大到1024 × 1024）</li>
+<li>本质上仍是采样不足的问题，与抗锯齿的问题相似。</li>
+<li>可以采用DLSS（Deep Learning Super Sampling）的方法，利用深度学习猜出来。</li>
+</ul>
+
+        <h1 id="可见性-x2F-遮挡-Visiblity-x2F-occlusion"   >
+          <a href="#可见性-x2F-遮挡-Visiblity-x2F-occlusion" class="heading-link"><i class="fas fa-link"></i></a><a href="#可见性-x2F-遮挡-Visiblity-x2F-occlusion" class="headerlink" title="可见性 &#x2F; 遮挡 Visiblity &#x2F; occlusion"></a>可见性 &#x2F; 遮挡 Visiblity &#x2F; occlusion</h1>
+      
+        <h2 id="画家算法-Painter’s-Algorithm"   >
+          <a href="#画家算法-Painter’s-Algorithm" class="heading-link"><i class="fas fa-link"></i></a><a href="#画家算法-Painter’s-Algorithm" class="headerlink" title="画家算法 Painter’s Algorithm"></a>画家算法 Painter’s Algorithm</h2>
+      <p>思想：首先绘制距离较远的场景，然后用绘制距离较近的场景覆盖较远的部分。<br>存在的问题：首先画家算法需要按照深度排序需要将物体按照深度进行排序，但是对于以下三个三角形，无法确定深度的顺序，所以实际上我们无法使用画家算法。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c7060de842ff436d8d07b1497a50d202.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="深度缓存-Z-Buffer"   >
+          <a href="#深度缓存-Z-Buffer" class="heading-link"><i class="fas fa-link"></i></a><a href="#深度缓存-Z-Buffer" class="headerlink" title="深度缓存 Z-Buffer"></a>深度缓存 Z-Buffer</h2>
+      <ol>
+<li>存储每个像素当前最小的z值（深度值）</li>
+<li>需要一个额外的缓存来存储深度值</li>
+</ol>
+<ul>
+<li>frame buffer 存储颜色值</li>
+<li>depth buffer（z-buffer）存储深度值（为了简化，我们假设所有z都是正数，z越小越近）<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/551f4b8483514d7783866ad5ccc93d01.png"  alt="在这里插入图片描述">
+      <br>上述两张图同步生成，左边的图实际渲染，右边的是深度缓存图，离我们近颜色越深，反之离我们越远。</li>
+</ul>
+
+        <h2 id="Z-Buffer-算法"   >
+          <a href="#Z-Buffer-算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#Z-Buffer-算法" class="headerlink" title="Z-Buffer 算法"></a>Z-Buffer 算法</h2>
+      <ol>
+<li>初始化深度缓存为无限大</li>
+<li>在光栅化时，有：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/6fa876c4df2c45e2acb8cb29b19a6d61.png"  alt="在这里插入图片描述">
+      <br>例子：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4d14740ba9034203a3f9f6edff992d0a.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221022/">https://fengqianye.github.io/2022/10/22/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221022/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2022/10/23/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221023/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">计算机图形学学习20221023</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/21/Other/qianLingHomework/"><span class="paginator-prev__text">千灵数据结构习题</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Artifacts-%E7%91%95%E7%96%B5"><span class="toc-number">1.</span> <span class="toc-text">
+          Artifacts 瑕疵</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%87%E6%A0%B7%E4%BA%A7%E7%94%9F%E7%9A%84Artifacts"><span class="toc-number">1.1.</span> <span class="toc-text">
+          采样产生的Artifacts</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%AF%E9%BD%BF"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          锯齿</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%91%A9%E5%B0%94%E7%BA%B9"><span class="toc-number">1.1.2.</span> <span class="toc-text">
+          摩尔纹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A7%E7%94%9FArtifacts-%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="toc-number">1.1.3.</span> <span class="toc-text">
+          产生Artifacts 的原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E7%A7%8D%E5%8F%8D%E8%B5%B0%E6%A0%B7%E7%9A%84%E6%96%B9%E6%B3%95-%E2%80%94%E2%80%94-%E5%9C%A8%E9%87%87%E6%A0%B7%E4%B9%8B%E5%89%8D%E5%81%9A%E6%A8%A1%E7%B3%8A%EF%BC%88%E6%BB%A4%E6%B3%A2%EF%BC%89"><span class="toc-number">1.1.4.</span> <span class="toc-text">
+          一种反走样的方法 —— 在采样之前做模糊（滤波）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%A2%91%E7%8E%87%E6%96%B9%E9%9D%A2%E7%9A%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">2.</span> <span class="toc-text">
+          频率方面的基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%91%E5%9F%9F-Frequency-Domain"><span class="toc-number">2.1.</span> <span class="toc-text">
+          频域 Frequency Domain</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A2%91%E7%8E%87%E5%92%8C%E5%91%A8%E6%9C%9F"><span class="toc-number">2.2.</span> <span class="toc-text">
+          频率和周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2"><span class="toc-number">2.3.</span> <span class="toc-text">
+          傅里叶变换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%82%85%E9%87%8C%E5%8F%B6%E7%BA%A7%E6%95%B0%E5%B1%95%E5%BC%80"><span class="toc-number">2.3.1.</span> <span class="toc-text">
+          傅里叶级数展开</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2-1"><span class="toc-number">2.3.2.</span> <span class="toc-text">
+          傅里叶变换</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E%E9%A2%91%E7%8E%87%E5%9B%BE%E5%83%8F%E4%B8%8A%E6%9D%A5%E5%88%86%E6%9E%90%E8%B5%B0%E6%A0%B7"><span class="toc-number">2.4.</span> <span class="toc-text">
+          从频率图像上来分析走样</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%BB%A4%E6%B3%A2"><span class="toc-number">3.</span> <span class="toc-text">
+          滤波</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E5%8C%96%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">3.1.</span> <span class="toc-text">
+          傅里叶变化的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E9%80%9A%E6%BB%A4%E6%B3%A2%EF%BC%88High-pass-filter%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">
+          高通滤波（High-pass filter）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%8E%E9%80%9A%E6%BB%A4%E6%B3%A2-x2F-%E6%A8%A1%E7%B3%8A%EF%BC%88Low-pass-filter-x2F-Blur%EF%BC%89"><span class="toc-number">3.3.</span> <span class="toc-text">
+          低通滤波&#x2F;模糊（Low-pass filter&#x2F;Blur）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%A6%E9%80%9A%E6%BB%A4%E6%B3%A2%EF%BC%88Band-pass-filter%EF%BC%89"><span class="toc-number">3.4.</span> <span class="toc-text">
+          带通滤波（Band-pass filter）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF-Convolution"><span class="toc-number">4.</span> <span class="toc-text">
+          卷积 Convolution</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E5%AE%9A%E7%90%86-Convolution-Theorem"><span class="toc-number">4.1.</span> <span class="toc-text">
+          卷积定理 Convolution Theorem</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E5%AE%9A%E7%90%86%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">4.2.</span> <span class="toc-text">
+          卷积定理的应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E4%B8%AD%E7%9A%84%E4%BD%8E%E9%80%9A%E6%BB%A4%E6%B3%A2%E5%99%A8"><span class="toc-number">4.3.</span> <span class="toc-text">
+          卷积中的低通滤波器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%B7%E7%A7%AF%E6%A0%B8%E5%A4%A7%E5%B0%8F%E4%B8%8E%E9%A2%91%E7%8E%87%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">4.4.</span> <span class="toc-text">
+          卷积核大小与频率的关系</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8E%E9%A2%91%E7%8E%87%E7%9A%84%E8%A7%92%E5%BA%A6%E7%9C%8B%E9%87%87%E6%A0%B7"><span class="toc-number">5.</span> <span class="toc-text">
+          从频率的角度看采样</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%B2%E6%BF%80%E5%87%BD%E6%95%B0"><span class="toc-number">5.1.</span> <span class="toc-text">
+          冲激函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%BE%97%E9%87%87%E6%A0%B7%EF%BC%88%E4%B8%8E%E5%86%B2%E6%BF%80%E5%87%BD%E6%95%B0%E7%9B%B8%E4%B9%98%EF%BC%89"><span class="toc-number">5.2.</span> <span class="toc-text">
+          获得采样（与冲激函数相乘）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%B0%E6%A0%B7-x3D-%E9%A2%91%E8%B0%B1%E5%9C%A8%E6%90%AC%E7%A7%BB%E5%90%8E%E5%87%BA%E7%8E%B0%E4%BA%86%E6%B7%B7%E5%90%88-Aliasing-x3D-Mixed-Frequency-Contents"><span class="toc-number">5.3.</span> <span class="toc-text">
+          走样 &#x3D; 频谱在搬移后出现了混合 Aliasing&#x3D;Mixed Frequency Contents</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%8F%E5%B0%91%E8%B5%B0%E6%A0%B7%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">6.</span> <span class="toc-text">
+          减少走样的方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E9%87%87%E6%A0%B7%E7%8E%87"><span class="toc-number">6.1.</span> <span class="toc-text">
+          增加采样率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8C%E5%8F%8D%E8%B5%B0%E6%A0%B7"><span class="toc-number">6.2.</span> <span class="toc-text">
+          进行反走样</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%A8%A1%E7%B3%8A%E4%B8%89%E8%A7%92%E5%BD%A2%E2%80%94%E9%80%9A%E8%BF%87%E5%9C%A8%E5%83%8F%E7%B4%A0%E5%8C%BA%E5%9F%9F%E5%B9%B3%E5%9D%87%E6%9D%A5%E5%8F%8D%E8%B5%B0%E6%A0%B7"><span class="toc-number">6.3.</span> <span class="toc-text">
+          如何模糊三角形—通过在像素区域平均来反走样</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E9%87%8D%E9%87%87%E6%A0%B7-Antialiasing-By-Supersampling%EF%BC%88MSAA%EF%BC%89"><span class="toc-number">6.4.</span> <span class="toc-text">
+          多重采样 Antialiasing By Supersampling（MSAA）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B6%85%E9%87%87%E6%A0%B7-Supersampling"><span class="toc-number">6.4.1.</span> <span class="toc-text">
+          超采样 Supersampling</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%8A%97%E9%94%AF%E9%BD%BF%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">6.5.</span> <span class="toc-text">
+          其他抗锯齿的方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E9%97%AE%E9%A2%98-Super-resolution-x2F-super-sampling"><span class="toc-number">7.</span> <span class="toc-text">
+          超分辨率问题 Super resolution &#x2F; super sampling</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E6%80%A7-x2F-%E9%81%AE%E6%8C%A1-Visiblity-x2F-occlusion"><span class="toc-number">8.</span> <span class="toc-text">
+          可见性 &#x2F; 遮挡 Visiblity &#x2F; occlusion</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%BB%E5%AE%B6%E7%AE%97%E6%B3%95-Painter%E2%80%99s-Algorithm"><span class="toc-number">8.1.</span> <span class="toc-text">
+          画家算法 Painter’s Algorithm</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%B1%E5%BA%A6%E7%BC%93%E5%AD%98-Z-Buffer"><span class="toc-number">8.2.</span> <span class="toc-text">
+          深度缓存 Z-Buffer</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Z-Buffer-%E7%AE%97%E6%B3%95"><span class="toc-number">8.3.</span> <span class="toc-text">
+          Z-Buffer 算法</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">23</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

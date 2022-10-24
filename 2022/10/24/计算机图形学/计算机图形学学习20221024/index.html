@@ -1,0 +1,392 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="纹理映射、三角形的插值：重心坐标(Barycentric Coordinates)、纹理相关问题、纹理太小了、纹理太大了、Mipmap的流程、纹理的应用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221024">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221024/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="纹理映射、三角形的插值：重心坐标(Barycentric Coordinates)、纹理相关问题、纹理太小了、纹理太大了、Mipmap的流程、纹理的应用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c2a677227c3143d3955b78f893cbe590.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4887ec566d8d4dfd95190d8b511e03a6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2edf2a6819284aa19189d89c1bf5fd4a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b3eb3689d82d478d90c847c5bc59c385.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d2bfb437f52a45b1a526d979e1f2b1de.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb5c26bc96154cd084e42a8a870860ee.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/81f1993d9ad94a9589754c522870abf5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c8d1164549e142598af9632779fd1ff4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/47ac39b321e549648d3ec07c8b4f4794.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5e9f74df0a654d458853cdaaacee33cf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8fbe01fea54c4a1ea1017767322b19b6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4379640a2ce14ce497e63115b11b86d2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/181e6b20fa6847b1b885da515a2a33ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9b7c16676a344deaa3c36d5ff876bf59.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8e0fa2d1344f4c0bb24d7b6cb8781fcf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/39386f64c38b490c87344f0e5a7752ea.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/83c3d3180aeb454e94cb2b9ab873a4be.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a04d15ed33634f019575106c1ca6ada8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d9be476bf0ae4bc68457ed8ac4c44578.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2233b9e8326c476a8cdb4cc0d0d9c3b2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/71516ea9f63f4fdcb6ca9bbe862a37ae.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d23162f5f792491aa71cdba1516c81f2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8e6c409a0df849edb3b1f4ab32102240.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7ab08e92edc14631bbf928ab53c8da26.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ac1a2d90015140618f2ac4c11a1f1dbe.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/fb7543a86ba440f3b11262c46c1ce656.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b3a83090b0d0486aadf4912dd51f89e9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/237e73c099204a1286ce24e0c5ed85c0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/398c6992ffe5451a8b4dca423acf833d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8b4c91f904bf412c8b40bb1be6f883a3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7005df6201f9406498c259650297af83.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7fedcbf020074dd8afd8ec7e8d44d1fa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5bbd72209d584ebdafdbae14ba6d8f47.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/093b3f5e7e634164bfc175781dc87edf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/79c9f82e88db47b4bc04ab7151ba0579.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5c18c3c7d213474f83c5e6a0752749a3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/8f08a23e152c461dbfb4854cecaa38f0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/57fb6dcd236843dcb2d2791980d21ad5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/214b5d57be92408f9620461271f3cd52.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f24dcfd458184b94a4d3b862e9183f96.png">
+<meta property="article:published_time" content="2022-10-24T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-24T12:46:43.641Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/c2a677227c3143d3955b78f893cbe590.png"><title>计算机图形学学习20221024 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221024/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221024</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-24</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-24</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">3.5k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">18分</span></span></div></header><div class="post-body">
+        <h1 id="纹理映射"   >
+          <a href="#纹理映射" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理映射" class="headerlink" title="纹理映射"></a>纹理映射</h1>
+      <p>纹理就是一张图，将其贴在三维物体。<br>纹理映射（Texture Mapping），又称纹理贴图，是将纹理空间中的纹理像素映射到屏幕空间中的像素的过程。简单来说，就是把一幅图像贴到三维物体的表面上来增强真实感。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c2a677227c3143d3955b78f893cbe590.png"  alt="在这里插入图片描述">
+      <br>任意三角形的顶点都能找到顶点在纹理上哪个位置。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4887ec566d8d4dfd95190d8b511e03a6.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2edf2a6819284aa19189d89c1bf5fd4a.png"  alt="在这里插入图片描述">
+      <br>不管长宽比和分辨率，U和V的范围都在0到1内。三角形的三个顶点，每个顶点都对应一个UV。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b3eb3689d82d478d90c847c5bc59c385.png"  alt="在这里插入图片描述">
+      <br>纹理能被多次使用。如果纹理重复上下左右可以无缝衔接，则称这个纹理是tiled textures。（有一种算法叫Wang tiling）<br><strong>知道了三角形的三个顶点的UV坐标，如何得出三角形内部的UV坐标，引出三角形的插值。</strong></p>
+
+        <h1 id="三角形的插值：重心坐标-Barycentric-Coordinates"   >
+          <a href="#三角形的插值：重心坐标-Barycentric-Coordinates" class="heading-link"><i class="fas fa-link"></i></a><a href="#三角形的插值：重心坐标-Barycentric-Coordinates" class="headerlink" title="三角形的插值：重心坐标(Barycentric Coordinates)"></a>三角形的插值：重心坐标(Barycentric Coordinates)</h1>
+      
+        <h2 id="插值的作用"   >
+          <a href="#插值的作用" class="heading-link"><i class="fas fa-link"></i></a><a href="#插值的作用" class="headerlink" title="插值的作用"></a>插值的作用</h2>
+      <p>如果对三角形的三个顶点都有特定的值，可以得到三角形内任何一点的这个值，并且这些值从一个顶点到另一个顶点是<strong>平滑过渡</strong>的。<br><strong>插值的对象？</strong><br>纹理坐标，颜色，法线向量…<br><strong>插值的方法？</strong><br>重心坐标</p>
+
+        <h2 id="重心坐标系"   >
+          <a href="#重心坐标系" class="heading-link"><i class="fas fa-link"></i></a><a href="#重心坐标系" class="headerlink" title="重心坐标系"></a>重心坐标系</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d2bfb437f52a45b1a526d979e1f2b1de.png"  alt="在这里插入图片描述">
+      <br>重心坐标是定义在三角形上的，在重心坐标系中，三角形平面的任何一个点(x,y)都可以表示成三角形三个顶点的线性组合（系数分别是α β γ ，且满足这三个系数相加和为1）。如果这个点在三角形内，则需要α β γ都是非负的。<br>例如：<br>A点的重心坐标( α , β , γ ) &#x3D; ( 1 , 0 , 0 )且(x,y)&#x3D;αA+βB+γC&#x3D;A</p>
+
+        <h2 id="获得三角形的重心"   >
+          <a href="#获得三角形的重心" class="heading-link"><i class="fas fa-link"></i></a><a href="#获得三角形的重心" class="headerlink" title="获得三角形的重心"></a>获得三角形的重心</h2>
+      <p>重心的性质：将重心与三个顶点相连，可以把三角形分割成等面积的三个三角形。下面是重心坐标系和普通坐标系下的三角形重心坐标。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/fb5c26bc96154cd084e42a8a870860ee.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="获得三角形任意一点的重心坐标"   >
+          <a href="#获得三角形任意一点的重心坐标" class="heading-link"><i class="fas fa-link"></i></a><a href="#获得三角形任意一点的重心坐标" class="headerlink" title="获得三角形任意一点的重心坐标"></a>获得三角形任意一点的重心坐标</h2>
+      <p>可以通过面积比求重心坐标。α,β,γ的计算如下所示，其中A点对应A <sub>A</sub>(表示A点的面积)，B点对于B<sub>B</sub>,C点对于C<sub>C</sub><br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/81f1993d9ad94a9589754c522870abf5.png"  alt="在这里插入图片描述">
+      <br>然后通过叉积求面积，得到重心坐标的一般的表达式。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c8d1164549e142598af9632779fd1ff4.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="使用重心坐标"   >
+          <a href="#使用重心坐标" class="heading-link"><i class="fas fa-link"></i></a><a href="#使用重心坐标" class="headerlink" title="使用重心坐标"></a>使用重心坐标</h2>
+      <ol>
+<li>先算出重心坐标的位置,确定α β γ</li>
+<li>再利用重心坐标做插值<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/47ac39b321e549648d3ec07c8b4f4794.png"  alt="在这里插入图片描述">
+      <br>V可以是任何属性，只要根据位置把α β γ确定下来，就可以确定该位置对应某个属性的插值。<br>注意：<br>如果三角形是空间里的三角形，投影后三角形会发生变化，重心发生变化。即投影变换下，重心坐标是不能保持不变的。所以<strong>想要插值三维空间的属性，就要找三维的坐标，算出相应的重心坐标并做插值</strong>，不能在投影后的三角形做插值（比如深度）。</li>
+</ol>
+
+        <h1 id="应用纹理"   >
+          <a href="#应用纹理" class="heading-link"><i class="fas fa-link"></i></a><a href="#应用纹理" class="headerlink" title="应用纹理"></a>应用纹理</h1>
+      <p>对于<strong>每一个光栅化的样本</strong>（x,y）的应用流程如下：</p>
+<ol>
+<li>根据三角形顶点的纹理坐标获得该位置的(u,v)。</li>
+<li>在纹理上查询这个（u，v）对应的颜色值</li>
+<li>在该样本设置这个颜色。可以认为这个纹理定义漫反射系数Kd，如果使用Blinn-Phong，将纹理颜色替换kd，便可以将纹理贴上去，同时拥有Blinn-Phong的效果。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5e9f74df0a654d458853cdaaacee33cf.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h1 id="纹理相关问题"   >
+          <a href="#纹理相关问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理相关问题" class="headerlink" title="纹理相关问题"></a>纹理相关问题</h1>
+      
+        <h2 id="纹理太小了"   >
+          <a href="#纹理太小了" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理太小了" class="headerlink" title="纹理太小了"></a>纹理太小了</h2>
+      <p>假设一张 480 * 270 尺寸的纹理要铺满渲染到分辨率为 1920 * 1080 的屏幕上，此时一个纹素的大小可以理解为是像素的4倍，多个像素点对应一个纹理坐标。<br>对于任何一个点找到纹理上的位置，如果纹理上的这个位置不是整数，采用四舍五入的办法变成整数。<strong>这样的话在一定范围内查找的是相同的纹理上的像素</strong>（texel 称为纹理元素、纹素 ）。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8fbe01fea54c4a1ea1017767322b19b6.png"  alt="在这里插入图片描述">
+      <br>纹理太小会出现一块一块的效果，没有平滑的过渡。</p>
+
+        <h3 id="双线性插值-Bilinear-interpolation"   >
+          <a href="#双线性插值-Bilinear-interpolation" class="heading-link"><i class="fas fa-link"></i></a><a href="#双线性插值-Bilinear-interpolation" class="headerlink" title="双线性插值 Bilinear interpolation"></a>双线性插值 Bilinear interpolation</h3>
+      <p>如图中红色点是屏幕空间下一像素所对应在纹理空间中的点，会去采样离他最近的那个纹理颜色点，这种近似采样方法是不可取的。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4379640a2ce14ce497e63115b11b86d2.png"  alt="在这里插入图片描述">
+      <br>首先取出离红色点最近的4个黑色顶点，分别算出，该红色点在水平及竖直方向偏移的比率s,t，如下图所示。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/181e6b20fa6847b1b885da515a2a33ce.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9b7c16676a344deaa3c36d5ff876bf59.png"  alt="在这里插入图片描述">
+      </p>
+<p>水平方向插值得u<sub>0</sub>和u<sub>1</sub>，竖直方向插值得结果：</p>
+<ol>
+<li>利用<strong>水平比例s</strong>，线性插值出u<sub>00</sub>和u<sub>10</sub>之间u<sub>0</sub>点的颜色值，以及u<sub>01</sub>和u<sub>11</sub>之间的u<sub>1</sub>点的颜色值。</li>
+<li>最后<strong>利用竖直方向比例t</strong>，对u<sub>0</sub>和u<sub>1</sub>线性插值出红色点的颜色值。<br>这样利用两次线性插值，考虑到了周围4个点的颜色值，得到了平滑过渡的颜色，能够很好的缓解走样失真现象，并且计算速度较快。</li>
+</ol>
+
+        <h3 id="Bicubic-双向三次插值"   >
+          <a href="#Bicubic-双向三次插值" class="heading-link"><i class="fas fa-link"></i></a><a href="#Bicubic-双向三次插值" class="headerlink" title="Bicubic 双向三次插值"></a>Bicubic 双向三次插值</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8e0fa2d1344f4c0bb24d7b6cb8781fcf.png"  alt="在这里插入图片描述">
+      <br>除了双线性插值外，还可以使用双三次插值(Bicubic Interpolation)，取的是周围16个像素而非4个像素（非线性），虽然效果好但是带来的弊端就是开销会很大。</p>
+
+        <h2 id="纹理太大了"   >
+          <a href="#纹理太大了" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理太大了" class="headerlink" title="纹理太大了"></a>纹理太大了</h2>
+      
+        <h3 id="后果严重的走样"   >
+          <a href="#后果严重的走样" class="heading-link"><i class="fas fa-link"></i></a><a href="#后果严重的走样" class="headerlink" title="后果严重的走样"></a>后果严重的走样</h3>
+      <p>如果纹理过大会出现更加严重的走样，<strong>远处摩尔纹，近处锯齿</strong>。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/39386f64c38b490c87344f0e5a7752ea.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="原因"   >
+          <a href="#原因" class="heading-link"><i class="fas fa-link"></i></a><a href="#原因" class="headerlink" title="原因"></a>原因</h3>
+      <p>由于近大远小的透视关系，对于一个像素来说，近处覆盖的纹理区域相对较小，许多个采样点对应了同一个纹理颜色；而远处覆盖的纹理区域则很大，用一个点的采样无法代表一大块纹理区域的颜色变化。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/83c3d3180aeb454e94cb2b9ab873a4be.png"  alt="在这里插入图片描述">
+      <br>这种屏幕像素对纹理贴图的覆盖区域，被形象的称为屏幕像素在纹理空间的<strong>footprint</strong>。<br>屏幕上的像素从近到远，一个像素覆盖纹理上的区域是由少到多的。<br>但是对于很远的点，一个像素的颜色值以一个中心点来采样是相当不准确的。</p>
+
+        <h4 id="从采样来看纹理过大的影响"   >
+          <a href="#从采样来看纹理过大的影响" class="heading-link"><i class="fas fa-link"></i></a><a href="#从采样来看纹理过大的影响" class="headerlink" title="从采样来看纹理过大的影响"></a>从采样来看纹理过大的影响</h4>
+      <p>其实道理类似，纹理过大，每个纹素的大小相较于像素更小了，就导致每个像素覆盖的区域实际上会包含多个纹素，但在片元着色阶段只会进行一次点采样，得到的结果显然是不够“精密”的。从信号学的角度上来理解，每个像素的采样频率远远低于纹理上的变化频率，于是也会形成锯齿的效果。假设一张特别大的纹理贴在地面上，由于透视摄像机的近大远小原理，会放大像素与纹素的信号频率差距，因此远处的地面会形成一种叫做“摩尔纹”的效果。</p>
+
+        <h4 id="解决的思路"   >
+          <a href="#解决的思路" class="heading-link"><i class="fas fa-link"></i></a><a href="#解决的思路" class="headerlink" title="解决的思路"></a>解决的思路</h4>
+      <p>对于锯齿的效果，上面说过可以采用双线性插值方法修复，通过插值平滑的过渡；对于摩尔纹，由于采样点不足，采样的速度跟不上信号变化的速度，可以采用超采样方式，增加采样点，例如几百倍的超采样，显然可以解决问题，但是付出的代价是极为高昂的计算成本，显然不可取。<br>解决方法：避免采样，不采样，快速获得一片区域的平均值,范围查询。</p>
+
+        <h4 id="Mipmap"   >
+          <a href="#Mipmap" class="heading-link"><i class="fas fa-link"></i></a><a href="#Mipmap" class="headerlink" title="Mipmap"></a>Mipmap</h4>
+      
+        <h5 id="引入"   >
+          <a href="#引入" class="heading-link"><i class="fas fa-link"></i></a><a href="#引入" class="headerlink" title="引入"></a>引入</h5>
+      <ol>
+<li>超采样可以解决纹理过大的问题，但是它消耗过大，如果有一种算法可以立刻获得平均而不用进行太多计算就好了。</li>
+<li>从近到远一个像素对应的采样区域大小是不同的，所以这个算法的范围查询应该可以查出任意不同范围的大小。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a04d15ed33634f019575106c1ca6ada8.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h5 id="作用"   >
+          <a href="#作用" class="heading-link"><i class="fas fa-link"></i></a><a href="#作用" class="headerlink" title="作用"></a>作用</h5>
+      <p>允许进行不同大小的范围查询。（快速的正方形的近似范围查询fast、approx.、square）</p>
+
+        <h5 id="定义"   >
+          <a href="#定义" class="heading-link"><i class="fas fa-link"></i></a><a href="#定义" class="headerlink" title="定义"></a>定义</h5>
+      <p>Mipmap是一种典型的空间换时间的解决方案，通过「范围查询」来替代之前双线性差值所做的「点查询」，它的好处就是速度快，但是也有缺点：结果不够准确、只能用于正方形(2的幂次方）贴图，以及增加了额外的存储量（<strong>增量约为1&#x2F;3</strong>）。<br>Mip意思是很多不同的小东西。<br>对于一张贴图，可以不断将分辨率缩小一半。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d9be476bf0ae4bc68457ed8ac4c44578.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2233b9e8326c476a8cdb4cc0d0d9c3b2.png"  alt="在这里插入图片描述">
+      <br>然后只需要找出每个像素在对应层对应位置的映射就可以了。</p>
+
+        <h5 id="Mipmap的流程"   >
+          <a href="#Mipmap的流程" class="heading-link"><i class="fas fa-link"></i></a><a href="#Mipmap的流程" class="headerlink" title="Mipmap的流程"></a>Mipmap的流程</h5>
+      <ol>
+<li>获得自己和邻居的中心位置，计算像素覆盖纹理的面积。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/71516ea9f63f4fdcb6ca9bbe862a37ae.png"  alt="在这里插入图片描述">
+      </li>
+<li>将这四个位置在纹理空间上进行映射。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d23162f5f792491aa71cdba1516c81f2.png"  alt="在这里插入图片描述">
+      <br>其中，D是层数，只需要知道L就可以计算，代表这个像素应该在第D层Mipmap去寻找颜色。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8e6c409a0df849edb3b1f4ab32102240.png"  alt="在这里插入图片描述">
+      <br>假设一个三角形覆盖屏幕一定区域的像素，其中选择一红色的采样点以及其相邻的3个采样点（都是红色），映射到纹理坐标系下，求出两个像素采样点在纹理坐标系下的近似长度 L 以及一块粉红色的区域。<strong>根据这块区域的近似面积以及纹素的大小</strong>，就可以得出该使用哪个层的Mip了。<br>比如：<br>如果正好是一个纹素的大小，也就是一个像素对应一个纹素，那么就选择第0层的Mip<br>如果对应四个纹素的大小，也就是一个像素对应4个纹素，那么就选择第1层的Mip</li>
+</ol>
+
+        <h5 id="问题"   >
+          <a href="#问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#问题" class="headerlink" title="问题"></a>问题</h5>
+      <p>如下图是Mipmap可视化，可以发现有渐变，但是渐变不连续。<br>当计算出的层数恰好不是整数的时候（事实上经常会出现这种情况），同一纹理上的不同Mip之间会出现明显的断层现象，如下图底部的红色区域，深红色直接过渡到鲜红色，十分地不自然。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7ab08e92edc14631bbf928ab53c8da26.png"  alt="在这里插入图片描述">
+      <br>出现了这种不自然的过渡，解决办法依然是老办法：「差值」 ！</p>
+
+        <h5 id="三线性插值-Trilinear-Interpolation"   >
+          <a href="#三线性插值-Trilinear-Interpolation" class="heading-link"><i class="fas fa-link"></i></a><a href="#三线性插值-Trilinear-Interpolation" class="headerlink" title="三线性插值 Trilinear Interpolation"></a>三线性插值 Trilinear Interpolation</h5>
+      <p>三线性插值即两次查询，一次插值，找到D和D+1层的结果然后进行插值。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/ac1a2d90015140618f2ac4c11a1f1dbe.png"  alt="在这里插入图片描述">
+      <br>经过三线性插值后的Mipmap可视化<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/fb7543a86ba440f3b11262c46c1ce656.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h5 id="使用三线性差值计算出的Mipmap颜色依旧会有问题"   >
+          <a href="#使用三线性差值计算出的Mipmap颜色依旧会有问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#使用三线性差值计算出的Mipmap颜色依旧会有问题" class="headerlink" title="使用三线性差值计算出的Mipmap颜色依旧会有问题"></a>使用三线性差值计算出的Mipmap颜色依旧会有问题</h5>
+      <p>出现了Overblur（远处模糊的过分了）<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b3a83090b0d0486aadf4912dd51f89e9.png"  alt="在这里插入图片描述">
+      <br>原因：只能对正方形进行近似，插值不是精确而是近似值。Mipmap只能针对正方形纹理进行Mip分层，<strong>当透视效果越明显，越远处的像素对应纹理中的区域会越不接近正方形</strong>（更像长条的矩形，甚至连矩形都不是），如果使用面积更大的正方形来包住这个区域，此时的结果就会愈加不准确，造成了越远处越模糊的感觉。</p>
+
+        <h2 id="（部分）解决三线性插值问题：各向异性过滤（Anisotropic-Filtering）"   >
+          <a href="#（部分）解决三线性插值问题：各向异性过滤（Anisotropic-Filtering）" class="heading-link"><i class="fas fa-link"></i></a><a href="#（部分）解决三线性插值问题：各向异性过滤（Anisotropic-Filtering）" class="headerlink" title="（部分）解决三线性插值问题：各向异性过滤（Anisotropic Filtering）"></a>（部分）解决三线性插值问题：各向异性过滤（Anisotropic Filtering）</h2>
+      <p>产生上面这种现象的原因是因为，所采用的不同level的Mipmap默认的都是正方形区域的采样，然而真实情况并不是如此，见下图:<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/237e73c099204a1286ce24e0c5ed85c0.png"  alt="在这里插入图片描述">
+      <br>可以看出不同屏幕空间的像素点所对应的footprint是不同的，有长方形，甚至是不规则图形，那么针对这种情况，有的需要水平方向的高level，有的需要竖直方向上的高level，因此也就出现了各向异性的<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/398c6992ffe5451a8b4dca423acf833d.png"  alt="在这里插入图片描述">
+      <br>各向异性可以用不同的长宽比进行缩小，也就是可以用矩形区域做范围查询，而代价就是消耗更多的存储。<br>利用这样不同比例的Mipmap贴图，结果就会明显好很多:<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8b4c91f904bf412c8b40bb1be6f883a3.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h5 id="覆盖不规则的形状-——-EWA-filtering"   >
+          <a href="#覆盖不规则的形状-——-EWA-filtering" class="heading-link"><i class="fas fa-link"></i></a><a href="#覆盖不规则的形状-——-EWA-filtering" class="headerlink" title="覆盖不规则的形状 —— EWA filtering"></a>覆盖不规则的形状 —— EWA filtering</h5>
+      <p>对于不规则的形状可以拆成几个圆形去覆盖这个形状。每次查询一个圆形，然后多次查询来覆盖不规则的形状。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7005df6201f9406498c259650297af83.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="纹理的应用"   >
+          <a href="#纹理的应用" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理的应用" class="headerlink" title="纹理的应用"></a>纹理的应用</h2>
+      
+        <h3 id="纹理的理解"   >
+          <a href="#纹理的理解" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理的理解" class="headerlink" title="纹理的理解"></a>纹理的理解</h3>
+      <p>在现代的GPU中， texture &#x3D; memory + range query,texture是一块数据可以做各种不同的查询。可以定义不同的属性，不限定为颜色，如高度、法线等向量信息</p>
+
+        <h4 id="环境光照（贴图）-Environment-Map"   >
+          <a href="#环境光照（贴图）-Environment-Map" class="heading-link"><i class="fas fa-link"></i></a><a href="#环境光照（贴图）-Environment-Map" class="headerlink" title="环境光照（贴图） Environment Map"></a>环境光照（贴图） Environment Map</h4>
+      <p>如下茶壶会被环境光照亮，即它可以反射出任何方向来的光。如下图就反射出了窗户和门<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7fedcbf020074dd8afd8ec7e8d44d1fa.png"  alt="在这里插入图片描述">
+      <br>可以把环境光记录到球上，并且展开。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5bbd72209d584ebdafdbae14ba6d8f47.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/093b3f5e7e634164bfc175781dc87edf.png"  alt="在这里插入图片描述">
+      <br>展开后出现了扭曲问题（向中间扭曲）<br>解决办法 —— Cube Map<br>即不把光照信息存在球的表面上，而是立方体的表面。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/79c9f82e88db47b4bc04ab7151ba0579.png"  alt="在这里插入图片描述">
+      <br>因为立方体各个面是均匀的，所以不会出现扭曲。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5c18c3c7d213474f83c5e6a0752749a3.png"  alt="在这里插入图片描述">
+      <br>存在的问题：相对于球来说，需要多记录一个方向。<br>本质：记录不同方向的光照信息。</p>
+
+        <h4 id="纹理可以影响着色"   >
+          <a href="#纹理可以影响着色" class="heading-link"><i class="fas fa-link"></i></a><a href="#纹理可以影响着色" class="headerlink" title="纹理可以影响着色"></a>纹理可以影响着色</h4>
+      <p>纹理可以定义任何不同位置任意不同的属性，比如定义任何一个点的相对高度。<br>如下图就是一种凹凸贴图（定义法线的不同），这样就可以不用定义复杂的几何形体。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/8f08a23e152c461dbfb4854cecaa38f0.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h4 id="Bump-Mapping-凹凸贴图"   >
+          <a href="#Bump-Mapping-凹凸贴图" class="heading-link"><i class="fas fa-link"></i></a><a href="#Bump-Mapping-凹凸贴图" class="headerlink" title="Bump Mapping 凹凸贴图"></a>Bump Mapping 凹凸贴图</h4>
+      <p>Normal Mapping法线贴图不等于Bump Mapping凹凸贴图，法线贴图存储的是法线，凹凸贴图存储的是高度差。</p>
+
+        <h5 id="凹凸贴图的作用"   >
+          <a href="#凹凸贴图的作用" class="heading-link"><i class="fas fa-link"></i></a><a href="#凹凸贴图的作用" class="headerlink" title="凹凸贴图的作用"></a>凹凸贴图的作用</h5>
+      <p>凹凸贴图可以定义复杂的纹理，但是不改变任何几何信息（三角形数量不变）。</p>
+<ul>
+<li>把任何一个像素的法线做扰动</li>
+<li>纹理定义任何一个点相对高度的移动</li>
+<li>然后可以通过高度的变化改变法线</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/57fb6dcd236843dcb2d2791980d21ad5.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h5 id="如何扰动法线（in-flatland）"   >
+          <a href="#如何扰动法线（in-flatland）" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何扰动法线（in-flatland）" class="headerlink" title="如何扰动法线（in flatland）"></a>如何扰动法线（in flatland）</h5>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/214b5d57be92408f9620461271f3cd52.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h5 id="如何扰动法线（in-3D）"   >
+          <a href="#如何扰动法线（in-3D）" class="heading-link"><i class="fas fa-link"></i></a><a href="#如何扰动法线（in-3D）" class="headerlink" title="如何扰动法线（in 3D）"></a>如何扰动法线（in 3D）</h5>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/f24dcfd458184b94a4d3b862e9183f96.png"  alt="在这里插入图片描述">
+      </p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221024/">https://fengqianye.github.io/2022/10/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221024/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/23/Other/hello-world/"><span class="paginator-prev__text">利用GitHub搭建个人网站</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E6%98%A0%E5%B0%84"><span class="toc-number">1.</span> <span class="toc-text">
+          纹理映射</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9A%84%E6%8F%92%E5%80%BC%EF%BC%9A%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87-Barycentric-Coordinates"><span class="toc-number">2.</span> <span class="toc-text">
+          三角形的插值：重心坐标(Barycentric Coordinates)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%92%E5%80%BC%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">2.1.</span> <span class="toc-text">
+          插值的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text">
+          重心坐标系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%BE%97%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9A%84%E9%87%8D%E5%BF%83"><span class="toc-number">2.3.</span> <span class="toc-text">
+          获得三角形的重心</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%BE%97%E4%B8%89%E8%A7%92%E5%BD%A2%E4%BB%BB%E6%84%8F%E4%B8%80%E7%82%B9%E7%9A%84%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87"><span class="toc-number">2.4.</span> <span class="toc-text">
+          获得三角形任意一点的重心坐标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E9%87%8D%E5%BF%83%E5%9D%90%E6%A0%87"><span class="toc-number">2.5.</span> <span class="toc-text">
+          使用重心坐标</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BA%94%E7%94%A8%E7%BA%B9%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">
+          应用纹理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="toc-number">4.</span> <span class="toc-text">
+          纹理相关问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E5%A4%AA%E5%B0%8F%E4%BA%86"><span class="toc-number">4.1.</span> <span class="toc-text">
+          纹理太小了</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC-Bilinear-interpolation"><span class="toc-number">4.1.1.</span> <span class="toc-text">
+          双线性插值 Bilinear interpolation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bicubic-%E5%8F%8C%E5%90%91%E4%B8%89%E6%AC%A1%E6%8F%92%E5%80%BC"><span class="toc-number">4.1.2.</span> <span class="toc-text">
+          Bicubic 双向三次插值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E5%A4%AA%E5%A4%A7%E4%BA%86"><span class="toc-number">4.2.</span> <span class="toc-text">
+          纹理太大了</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E6%9E%9C%E4%B8%A5%E9%87%8D%E7%9A%84%E8%B5%B0%E6%A0%B7"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          后果严重的走样</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">4.2.2.</span> <span class="toc-text">
+          原因</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E9%87%87%E6%A0%B7%E6%9D%A5%E7%9C%8B%E7%BA%B9%E7%90%86%E8%BF%87%E5%A4%A7%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="toc-number">4.2.2.1.</span> <span class="toc-text">
+          从采样来看纹理过大的影响</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="toc-number">4.2.2.2.</span> <span class="toc-text">
+          解决的思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Mipmap"><span class="toc-number">4.2.2.3.</span> <span class="toc-text">
+          Mipmap</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BC%95%E5%85%A5"><span class="toc-number">4.2.2.3.1.</span> <span class="toc-text">
+          引入</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8"><span class="toc-number">4.2.2.3.2.</span> <span class="toc-text">
+          作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89"><span class="toc-number">4.2.2.3.3.</span> <span class="toc-text">
+          定义</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Mipmap%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">4.2.2.3.4.</span> <span class="toc-text">
+          Mipmap的流程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-number">4.2.2.3.5.</span> <span class="toc-text">
+          问题</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%89%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC-Trilinear-Interpolation"><span class="toc-number">4.2.2.3.6.</span> <span class="toc-text">
+          三线性插值 Trilinear Interpolation</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E4%B8%89%E7%BA%BF%E6%80%A7%E5%B7%AE%E5%80%BC%E8%AE%A1%E7%AE%97%E5%87%BA%E7%9A%84Mipmap%E9%A2%9C%E8%89%B2%E4%BE%9D%E6%97%A7%E4%BC%9A%E6%9C%89%E9%97%AE%E9%A2%98"><span class="toc-number">4.2.2.3.7.</span> <span class="toc-text">
+          使用三线性差值计算出的Mipmap颜色依旧会有问题</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EF%BC%88%E9%83%A8%E5%88%86%EF%BC%89%E8%A7%A3%E5%86%B3%E4%B8%89%E7%BA%BF%E6%80%A7%E6%8F%92%E5%80%BC%E9%97%AE%E9%A2%98%EF%BC%9A%E5%90%84%E5%90%91%E5%BC%82%E6%80%A7%E8%BF%87%E6%BB%A4%EF%BC%88Anisotropic-Filtering%EF%BC%89"><span class="toc-number">4.3.</span> <span class="toc-text">
+          （部分）解决三线性插值问题：各向异性过滤（Anisotropic Filtering）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E4%B8%8D%E8%A7%84%E5%88%99%E7%9A%84%E5%BD%A2%E7%8A%B6-%E2%80%94%E2%80%94-EWA-filtering"><span class="toc-number">4.3.0.0.1.</span> <span class="toc-text">
+          覆盖不规则的形状 —— EWA filtering</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-number">4.4.</span> <span class="toc-text">
+          纹理的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E7%9A%84%E7%90%86%E8%A7%A3"><span class="toc-number">4.4.1.</span> <span class="toc-text">
+          纹理的理解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%85%89%E7%85%A7%EF%BC%88%E8%B4%B4%E5%9B%BE%EF%BC%89-Environment-Map"><span class="toc-number">4.4.1.1.</span> <span class="toc-text">
+          环境光照（贴图） Environment Map</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%B9%E7%90%86%E5%8F%AF%E4%BB%A5%E5%BD%B1%E5%93%8D%E7%9D%80%E8%89%B2"><span class="toc-number">4.4.1.2.</span> <span class="toc-text">
+          纹理可以影响着色</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Bump-Mapping-%E5%87%B9%E5%87%B8%E8%B4%B4%E5%9B%BE"><span class="toc-number">4.4.1.3.</span> <span class="toc-text">
+          Bump Mapping 凹凸贴图</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%B9%E5%87%B8%E8%B4%B4%E5%9B%BE%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">4.4.1.3.1.</span> <span class="toc-text">
+          凹凸贴图的作用</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%89%B0%E5%8A%A8%E6%B3%95%E7%BA%BF%EF%BC%88in-flatland%EF%BC%89"><span class="toc-number">4.4.1.3.2.</span> <span class="toc-text">
+          如何扰动法线（in flatland）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E6%89%B0%E5%8A%A8%E6%B3%95%E7%BA%BF%EF%BC%88in-3D%EF%BC%89"><span class="toc-number">4.4.1.3.3.</span> <span class="toc-text">
+          如何扰动法线（in 3D）</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">24</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

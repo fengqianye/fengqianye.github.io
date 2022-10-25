@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="几何的表示方法、隐式的几何表示（Implicit）、显式的几何（Explicit）、贝塞尔曲线（Bezier Curves）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221025">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221025/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="几何的表示方法、隐式的几何表示（Implicit）、显式的几何（Explicit）、贝塞尔曲线（Bezier Curves）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bfac8eb3828e47e998d7f78a40413dd5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/62a50257e789498f8900c3ada9eafebc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/43c64b6964f14ff489f9a073a1ba96b5.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9088b08359a248f59421cdd1e3245bb9.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/45bb31896ad94b42acaa217ee4f6a13e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e4f41a20e1524acdbea40ad83a61ff8c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/65817f42d9664acca93a84d80b5ea5cf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1c0f029fa2a240a1a1d3d50ba1b62047.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dbe52e191bf745678c7f7c9ea3a19c29.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/daab453b03514e2eacb177d6dea683ae.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/71cc790daae4457ebb320c44b335e549.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/6476c1f9e0ef4556840cefc30e3c1744.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/500f463146a4430098f1e1bd14d7c316.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/aef287a3307a4027bc4317bdc07fe25b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/94118bd915fd4ff48bb57eb2669f41a6.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/614dd71296554a7c8acef5c5dfc1816c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a34445daae8a4a4cad0998b67fbb4b93.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/08fe06c5aec247f5be6e76eaa8c149ab.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/eb7ba06ddef446dc8c0e50ebb6a0e6c3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/07d0d1f65775471aa3082c767590521f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/366f8a10f59d425e8503e2b5466d8791.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d9eb7e91747d4abab8c5841623c52196.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a08cf2f2170a4e06bcdc350cfa505356.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d0a8e1a4914b4e9589222462970885ea.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/5282e44c8930401e8c6d959c23f89789.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ee5f159af158429da19199d2d51eeeca.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a89166f25bcf4e8c9afefb0a2a8988d0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7db8f4f1216547fabce3202298ce147c.png">
+<meta property="article:published_time" content="2022-10-25T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-25T13:37:04.743Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/bfac8eb3828e47e998d7f78a40413dd5.png"><title>计算机图形学学习20221025 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221025/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221025</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-25</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-25</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">1.5k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">8分</span></span></div></header><div class="post-body">
+        <h1 id="几何的表示方法"   >
+          <a href="#几何的表示方法" class="heading-link"><i class="fas fa-link"></i></a><a href="#几何的表示方法" class="headerlink" title="几何的表示方法"></a>几何的表示方法</h1>
+      <p>分为显式(Explicit)和隐式(Implicit)。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/bfac8eb3828e47e998d7f78a40413dd5.png"  alt="在这里插入图片描述">
+      <br>隐式几何的表现形式：</p>
+<ul>
+<li>algebraic surface</li>
+<li>level sets</li>
+<li>distance function<br>显式几何的表现形式：</li>
+<li>point cloud</li>
+<li>polygon mesh</li>
+<li>subdivision,NURBS</li>
+</ul>
+
+        <h1 id="隐式的几何表示（Implicit）"   >
+          <a href="#隐式的几何表示（Implicit）" class="heading-link"><i class="fas fa-link"></i></a><a href="#隐式的几何表示（Implicit）" class="headerlink" title="隐式的几何表示（Implicit）"></a>隐式的几何表示（Implicit）</h1>
+      <p>不会告诉你几何体上的点在哪，而是把<strong>几何体上点的关系</strong>告诉你。</p>
+
+        <h2 id="表达式"   >
+          <a href="#表达式" class="heading-link"><i class="fas fa-link"></i></a><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/62a50257e789498f8900c3ada9eafebc.png"  alt="在这里插入图片描述">
+      <br>基于对点进行归类，找到满足特定关系的点。更通用的表示，f(x,y,z) &#x3D; 0</p>
+<p>优点：</p>
+<ol>
+<li>很容易判断点是否在面上。（将点代入f(x,y,z)，正数表示点在图形外，负数表示点在图形内，0表示点在图形上。）</li>
+<li>表述起来很容易（对存储很有利）。</li>
+<li>容易做面与光线求交。</li>
+<li>容易描述和处理拓扑结构。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>难以描述复杂的形状，</li>
+<li>很难知道这个面上有哪些点，很难看出式子表示的是什么形状。</li>
+</ol>
+
+        <h2 id="CSG-——-Constructive-Solid-Geometry-Implict"   >
+          <a href="#CSG-——-Constructive-Solid-Geometry-Implict" class="heading-link"><i class="fas fa-link"></i></a><a href="#CSG-——-Constructive-Solid-Geometry-Implict" class="headerlink" title="CSG —— Constructive Solid Geometry(Implict)"></a>CSG —— Constructive Solid Geometry(Implict)</h2>
+      <p>通过一系列基本几何的基本布尔运算来定义新的几何。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/43c64b6964f14ff489f9a073a1ba96b5.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="距离函数-Distance-Function（Implict）"   >
+          <a href="#距离函数-Distance-Function（Implict）" class="heading-link"><i class="fas fa-link"></i></a><a href="#距离函数-Distance-Function（Implict）" class="headerlink" title="距离函数 Distance Function（Implict）"></a>距离函数 Distance Function（Implict）</h2>
+      <p>距离函数：对于任何一个几何，不描述它的表面，而去描述空间中点到各个几何物体表面的最近距离，这个距离可以是正or负（Signed Distance 有向距离），后对于各个几何物体的距离函数进行运算，就可以得到blend融合后的距离函数。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9088b08359a248f59421cdd1e3245bb9.png"  alt="在这里插入图片描述">
+      </p>
+<p>例子：混合一个移动的边界<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/45bb31896ad94b42acaa217ee4f6a13e.png"  alt="在这里插入图片描述">
+      <br>通过blend两个SDF可以得到移动后的边界。<br>分别求出两个物体对应的距离函数， 然后把他们blend起来，可以获得由1&#x2F;3到2&#x2F;3移动的中间状态，一半白一半黑，边界是SDF&#x3D;0.<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e4f41a20e1524acdbea40ad83a61ff8c.png"  alt="在这里插入图片描述">
+      <br>分别计算出圆形和正方形的距离函数，<strong>输出的的面为SDF&#x3D;0</strong></p>
+
+        <h2 id="水平集-Level-Set-Methods-Implict"   >
+          <a href="#水平集-Level-Set-Methods-Implict" class="heading-link"><i class="fas fa-link"></i></a><a href="#水平集-Level-Set-Methods-Implict" class="headerlink" title="水平集 Level Set Methods(Implict)"></a>水平集 Level Set Methods(Implict)</h2>
+      <p>封闭形式的方程很难描述复杂的形状，所以选择一种替代方案：存储一个值近似函数的网格（可以是二维的也可以是三维的）<br>水平集可以理解为SDF的一种特殊状态，即表述方式不一样（SDF对于空间中的点有具体的定义，通过函数表示。而水平集则是对空间进行线性插值（格子）去近似得到一个函数曲线）。水平集通过对于每个点在定义好的格子上进行线性插值，得到每一个格子的具体函数值，找出所有f(x)&#x3D;0的点的曲线。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/65817f42d9664acca93a84d80b5ea5cf.png"  alt="在这里插入图片描述">
+      <br>通过找到插值为0的位置来找到表面，它具有一个对形状更加显示的控制。<br>例子：<br>如果有一个三维的纹理表示人体不同位置的骨密度，可以让密度函数&#x3D;某个具体的值，然后找到所有满足这个等式的位置，就可以得到一个表面。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1c0f029fa2a240a1a1d3d50ba1b62047.png"  alt="在这里插入图片描述">
+      <br>等高线图：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/dbe52e191bf745678c7f7c9ea3a19c29.png"  alt="在这里插入图片描述">
+      <br>水花 &#x3D; 空间中所有的水滴融合的结果<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/daab453b03514e2eacb177d6dea683ae.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="分形-Fractals-Implict"   >
+          <a href="#分形-Fractals-Implict" class="heading-link"><i class="fas fa-link"></i></a><a href="#分形-Fractals-Implict" class="headerlink" title="分形 Fractals(Implict)"></a>分形 Fractals(Implict)</h2>
+      <p>分形又有自相似的意思，自己的部分和整体很像（有点像递归），例子有雪花（不断的六边形）、下面的西兰花等。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/71cc790daae4457ebb320c44b335e549.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="显式的几何（Explicit）"   >
+          <a href="#显式的几何（Explicit）" class="heading-link"><i class="fas fa-link"></i></a><a href="#显式的几何（Explicit）" class="headerlink" title="显式的几何（Explicit）"></a>显式的几何（Explicit）</h1>
+      <p>显式几何也有很多种表示方法，例如三角形面、贝塞尔曲面、细分曲面、NURBS、点云等。<br>优点：对于表示形状很容易。<br>有点：难以判断点是否在表面上（或内、外）。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/6476c1f9e0ef4556840cefc30e3c1744.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="点云（Point-Cloud）"   >
+          <a href="#点云（Point-Cloud）" class="heading-link"><i class="fas fa-link"></i></a><a href="#点云（Point-Cloud）" class="headerlink" title="点云（Point Cloud）"></a>点云（Point Cloud）</h2>
+      <ul>
+<li>简单的表示为点的列表(x,y,z)</li>
+<li>可以简单的表示任何一种几何图形</li>
+<li>对于表示大数据集是很有用的（&gt;&gt;1 point&#x2F;pixel）</li>
+<li>经常被转换成多边形网格</li>
+<li>难以在采样不足的区域画出来</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/500f463146a4430098f1e1bd14d7c316.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="多边形网格（Polygon-Mesh）"   >
+          <a href="#多边形网格（Polygon-Mesh）" class="heading-link"><i class="fas fa-link"></i></a><a href="#多边形网格（Polygon-Mesh）" class="headerlink" title="多边形网格（Polygon Mesh）"></a>多边形网格（Polygon Mesh）</h2>
+      <ul>
+<li>存储点和多边形（通常是三角形或四边形）</li>
+<li>容易去处理&#x2F;模拟，进行自适应采样</li>
+<li>数据结构比较复杂</li>
+<li>图形学中最常用的表示</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/aef287a3307a4027bc4317bdc07fe25b.png"  alt="在这里插入图片描述">
+      <br>例如obj模型：<br>把空间中的所有顶点的坐标、法线、纹理坐标等信息记录下来，然后再把它们组合起来（存储在文本中）。<br>如下图表示了一个立方体</p>
+<ul>
+<li>v是顶点坐标</li>
+<li>vt是纹理坐标</li>
+<li>vn是法线（多了两条是因为建模误差）</li>
+<li>f(face)表示面，比如f 5&#x2F;1&#x2F;1 1&#x2F;2&#x2F;1 4&#x2F;3&#x2F;1 表示这个三角形面是由第5、1、4个顶点组成的，三个点的纹理坐标是第1、2、3对应的纹理坐标，这个面的法线是第一条法线。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/94118bd915fd4ff48bb57eb2669f41a6.png"  alt="在这里插入图片描述">
+      </li>
+</ul>
+
+        <h1 id="贝塞尔曲线（Bezier-Curves）"   >
+          <a href="#贝塞尔曲线（Bezier-Curves）" class="heading-link"><i class="fas fa-link"></i></a><a href="#贝塞尔曲线（Bezier-Curves）" class="headerlink" title="贝塞尔曲线（Bezier Curves）"></a>贝塞尔曲线（Bezier Curves）</h1>
+      <p> 用一系列的控制点来定义某一条曲线。这些控制点使用切线来定义贝塞尔曲线。<br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/614dd71296554a7c8acef5c5dfc1816c.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="计算贝塞尔曲线——de-Casteljau算法"   >
+          <a href="#计算贝塞尔曲线——de-Casteljau算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#计算贝塞尔曲线——de-Casteljau算法" class="headerlink" title="计算贝塞尔曲线——de Casteljau算法"></a>计算贝塞尔曲线——de Casteljau算法</h2>
+      <p> 使用线性插值插入点，分别在b<sub>0</sub>b<sub>1</sub>，b<sub>1</sub>b<sub>2</sub>以t&#x2F;1-t的比例插入一个点。<br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a34445daae8a4a4cad0998b67fbb4b93.png"  alt="在这里插入图片描述">
+      <br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/08fe06c5aec247f5be6e76eaa8c149ab.png"  alt="在这里插入图片描述">
+      <br> 将新得到两个点连接，以相同的方式插入第三个点。<br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/eb7ba06ddef446dc8c0e50ebb6a0e6c3.png"  alt="在这里插入图片描述">
+      <br> 对于[0,1]所有的时间t采用这种算法，最终获得曲线。</p>
+<p> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/07d0d1f65775471aa3082c767590521f.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="多段贝塞尔曲线"   >
+          <a href="#多段贝塞尔曲线" class="heading-link"><i class="fas fa-link"></i></a><a href="#多段贝塞尔曲线" class="headerlink" title="多段贝塞尔曲线"></a>多段贝塞尔曲线</h2>
+      <p> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/366f8a10f59d425e8503e2b5466d8791.png"  alt="在这里插入图片描述">
+      <br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d9eb7e91747d4abab8c5841623c52196.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="贝塞尔曲线代数公式"   >
+          <a href="#贝塞尔曲线代数公式" class="heading-link"><i class="fas fa-link"></i></a><a href="#贝塞尔曲线代数公式" class="headerlink" title="贝塞尔曲线代数公式"></a>贝塞尔曲线代数公式</h2>
+      <p> 如果有n+1个控制点（从0开始编号），可以得到n阶的贝塞尔曲线。<br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a08cf2f2170a4e06bcdc350cfa505356.png"  alt="在这里插入图片描述">
+      <br> 
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d0a8e1a4914b4e9589222462970885ea.png"  alt="在这里插入图片描述">
+      <br>贝塞尔曲线代数实际上是排列组合的公式。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/5282e44c8930401e8c6d959c23f89789.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="贝塞尔曲线的性质"   >
+          <a href="#贝塞尔曲线的性质" class="heading-link"><i class="fas fa-link"></i></a><a href="#贝塞尔曲线的性质" class="headerlink" title="贝塞尔曲线的性质"></a>贝塞尔曲线的性质</h2>
+      <ol>
+<li>贝塞尔曲线一定过起点和终点</li>
+<li>凸包（Convex hull）性质：贝塞尔曲线在控制点的凸包内。</li>
+<li>在仿射（Affine）变换下：对贝塞尔曲线做仿射变换与对控制点做仿射变换再获得贝塞尔曲线结果是相同的。</li>
+<li>对于3个控制点的贝塞尔曲线，起点和控制点、终点和控制点的连接线都是贝塞尔曲线的切线。</li>
+</ol>
+<p>凸包：能够包围几何形体的最小的凸多边形。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/ee5f159af158429da19199d2d51eeeca.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="贝塞尔曲面"   >
+          <a href="#贝塞尔曲面" class="heading-link"><i class="fas fa-link"></i></a><a href="#贝塞尔曲面" class="headerlink" title="贝塞尔曲面"></a>贝塞尔曲面</h1>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a89166f25bcf4e8c9afefb0a2a8988d0.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7db8f4f1216547fabce3202298ce147c.png"  alt="在这里插入图片描述">
+      </p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221025/">https://fengqianye.github.io/2022/10/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221025/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/24/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221024/"><span class="paginator-prev__text">计算机图形学学习20221024</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%A0%E4%BD%95%E7%9A%84%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">
+          几何的表示方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9A%90%E5%BC%8F%E7%9A%84%E5%87%A0%E4%BD%95%E8%A1%A8%E7%A4%BA%EF%BC%88Implicit%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">
+          隐式的几何表示（Implicit）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">
+          表达式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CSG-%E2%80%94%E2%80%94-Constructive-Solid-Geometry-Implict"><span class="toc-number">2.2.</span> <span class="toc-text">
+          CSG —— Constructive Solid Geometry(Implict)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%9D%E7%A6%BB%E5%87%BD%E6%95%B0-Distance-Function%EF%BC%88Implict%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">
+          距离函数 Distance Function（Implict）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B0%B4%E5%B9%B3%E9%9B%86-Level-Set-Methods-Implict"><span class="toc-number">2.4.</span> <span class="toc-text">
+          水平集 Level Set Methods(Implict)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E5%BD%A2-Fractals-Implict"><span class="toc-number">2.5.</span> <span class="toc-text">
+          分形 Fractals(Implict)</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%98%BE%E5%BC%8F%E7%9A%84%E5%87%A0%E4%BD%95%EF%BC%88Explicit%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">
+          显式的几何（Explicit）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%B9%E4%BA%91%EF%BC%88Point-Cloud%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">
+          点云（Point Cloud）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E8%BE%B9%E5%BD%A2%E7%BD%91%E6%A0%BC%EF%BC%88Polygon-Mesh%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">
+          多边形网格（Polygon Mesh）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%EF%BC%88Bezier-Curves%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">
+          贝塞尔曲线（Bezier Curves）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E2%80%94%E2%80%94de-Casteljau%E7%AE%97%E6%B3%95"><span class="toc-number">4.1.</span> <span class="toc-text">
+          计算贝塞尔曲线——de Casteljau算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E6%AE%B5%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF"><span class="toc-number">4.2.</span> <span class="toc-text">
+          多段贝塞尔曲线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E4%BB%A3%E6%95%B0%E5%85%AC%E5%BC%8F"><span class="toc-number">4.3.</span> <span class="toc-text">
+          贝塞尔曲线代数公式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E7%BA%BF%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="toc-number">4.4.</span> <span class="toc-text">
+          贝塞尔曲线的性质</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B4%9D%E5%A1%9E%E5%B0%94%E6%9B%B2%E9%9D%A2"><span class="toc-number">5.</span> <span class="toc-text">
+          贝塞尔曲面</span></a></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">25</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

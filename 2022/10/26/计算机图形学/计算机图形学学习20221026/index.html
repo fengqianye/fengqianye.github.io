@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="网格操作:曲面细分、曲面简化、曲面正则化（same triangles）让每个三角形更像正三角形。loop细分、Catmull-Clark细分、二次误差度量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221026">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221026/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="网格操作:曲面细分、曲面简化、曲面正则化（same triangles）让每个三角形更像正三角形。loop细分、Catmull-Clark细分、二次误差度量">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4e75f94b54a94b16b8434784872f32c1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/73e4001910434113a18b8fc54c2a09bf.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e75c974aacdb4eb09d6a4e9e93c69ef3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/dae5ccda41d6460b9a28fc2313846d42.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f090cb255ece4b0087ee46cba7927e0c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/17f281421d614b99bff640129f7ee6b2.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e8515e73964643a084e62f310eb4391b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a7cc760364c74c1bb3b28c60c56611e3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9db7304842124793985bd871aad13535.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7c868ee9a08d47828f6fc36dbaf8af11.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2e4109be0da4450995c7262e3e31829d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3967665c2ae84853b915c9703c2f558e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/172926f77c3f40eb93cda25ff3d60353.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/840fc335e5464981aabdff3fb6364175.png">
+<meta property="article:published_time" content="2022-10-26T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-26T08:38:34.010Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/4e75f94b54a94b16b8434784872f32c1.png"><title>计算机图形学学习20221026 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221026/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221026</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-26</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-26</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">746</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">4分</span></span></div></header><div class="post-body">
+        <h1 id="网格操作"   >
+          <a href="#网格操作" class="heading-link"><i class="fas fa-link"></i></a><a href="#网格操作" class="headerlink" title="网格操作"></a>网格操作</h1>
+      <p>常见的曲面操作有如下三种：</p>
+<ol>
+<li>曲面细分（Mesh Subdivision）</li>
+<li>曲面简化（Mesh Simplification）</li>
+<li>曲面正则化（same triangles）让每个三角形更像正三角形。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4e75f94b54a94b16b8434784872f32c1.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h2 id="曲面细分"   >
+          <a href="#曲面细分" class="heading-link"><i class="fas fa-link"></i></a><a href="#曲面细分" class="headerlink" title="曲面细分"></a>曲面细分</h2>
+      
+        <h3 id="loop细分"   >
+          <a href="#loop细分" class="heading-link"><i class="fas fa-link"></i></a><a href="#loop细分" class="headerlink" title="loop细分"></a>loop细分</h3>
+      <p>Loop细分一般有两步操作：</p>
+<ol>
+<li>将一个三角形变为4个三角形，把三角形数量增多。</li>
+<li>根据权重分配新的顶点（新顶点和旧顶点的调整方式不同）。
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/73e4001910434113a18b8fc54c2a09bf.png"  alt="在这里插入图片描述">
+      <br><strong>更新新的顶点的方法</strong>： 比如按照如下方式更新图中白点，白点是对周围几个面的平均，AB离得比CD近，所以权重大。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e75c974aacdb4eb09d6a4e9e93c69ef3.png"  alt="在这里插入图片描述">
+      <br><strong>更新旧顶点的方法</strong> ：根据自己原本的位置和自己周围顶点的位置来进行加权平均，如下所示（n是顶点度数）。老的顶点既要相信自己的位置，也要参考邻居的位置，n代表老顶点的度，u自定义。当n比较大时，老顶点受到邻居的影响比较大，（1-n*u）大。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/dae5ccda41d6460b9a28fc2313846d42.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h4 id="loop细分的结果"   >
+          <a href="#loop细分的结果" class="heading-link"><i class="fas fa-link"></i></a><a href="#loop细分的结果" class="headerlink" title="loop细分的结果"></a>loop细分的结果</h4>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/f090cb255ece4b0087ee46cba7927e0c.png"  alt="在这里插入图片描述">
+      <br>Loop细分只能解决三角形网格的细分问题，不是三角形，对于一般的情况可以采用Catmull-Clark细分。</p>
+
+        <h3 id="Catmull-Clark细分（General-Mesh）"   >
+          <a href="#Catmull-Clark细分（General-Mesh）" class="heading-link"><i class="fas fa-link"></i></a><a href="#Catmull-Clark细分（General-Mesh）" class="headerlink" title="Catmull-Clark细分（General Mesh）"></a>Catmull-Clark细分（General Mesh）</h3>
+      
+        <h4 id="基本概念"   >
+          <a href="#基本概念" class="heading-link"><i class="fas fa-link"></i></a><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h4>
+      <p>非四边形面（Non-quad face）：顾名思义。<br>奇异点（Extraordinary vertex）：度数不为4的点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/17f281421d614b99bff640129f7ee6b2.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h4 id="Catmull-Clark细分算法"   >
+          <a href="#Catmull-Clark细分算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#Catmull-Clark细分算法" class="headerlink" title="Catmull-Clark细分算法"></a>Catmull-Clark细分算法</h4>
+      <ol>
+<li>取每个面的一个点（比如重心）</li>
+<li>取每个边的中点</li>
+<li>将所有新添加的点做连接</li>
+</ol>
+<p>第一次细分:<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e8515e73964643a084e62f310eb4391b.png"  alt="在这里插入图片描述">
+      <br>第二次细分:<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a7cc760364c74c1bb3b28c60c56611e3.png"  alt="在这里插入图片描述">
+      </p>
+<ul>
+<li>在一次细分后会引入两个新的奇异点。</li>
+<li>新奇异点的度数为3，其他奇异点的度数不变。</li>
+<li>经过一次细分，所有非四边形面会消失</li>
+<li>细分之后，每个非四边形面都会变成一个奇异点（以后再细分奇异点和非四边形面都不会发生变化了）。</li>
+</ul>
+
+        <h4 id="调整规则"   >
+          <a href="#调整规则" class="heading-link"><i class="fas fa-link"></i></a><a href="#调整规则" class="headerlink" title="调整规则"></a>调整规则</h4>
+      <p>对于新增的点，<strong>面上的点和边上的点位置更新</strong>规则如下：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9db7304842124793985bd871aad13535.png"  alt="在这里插入图片描述">
+      <br>细分算法与图像模糊很相似，都是通过求平均实现平滑的过渡。</p>
+
+        <h4 id="loop细分和Catmull-Clark细分的对比"   >
+          <a href="#loop细分和Catmull-Clark细分的对比" class="heading-link"><i class="fas fa-link"></i></a><a href="#loop细分和Catmull-Clark细分的对比" class="headerlink" title="loop细分和Catmull-Clark细分的对比"></a>loop细分和Catmull-Clark细分的对比</h4>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7c868ee9a08d47828f6fc36dbaf8af11.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="曲面简化"   >
+          <a href="#曲面简化" class="heading-link"><i class="fas fa-link"></i></a><a href="#曲面简化" class="headerlink" title="曲面简化"></a>曲面简化</h2>
+      <p>目标：减少三角形的数量并保留整体的形状。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2e4109be0da4450995c7262e3e31829d.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="基本概念-1"   >
+          <a href="#基本概念-1" class="heading-link"><i class="fas fa-link"></i></a><a href="#基本概念-1" class="headerlink" title="基本概念"></a>基本概念</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/3967665c2ae84853b915c9703c2f558e.png"  alt="在这里插入图片描述">
+      <br>找到一条边将其捏在一起。</p>
+
+        <h3 id="二次误差度量（Quadric-Error-Metrics）"   >
+          <a href="#二次误差度量（Quadric-Error-Metrics）" class="heading-link"><i class="fas fa-link"></i></a><a href="#二次误差度量（Quadric-Error-Metrics）" class="headerlink" title="二次误差度量（Quadric Error Metrics）"></a>二次误差度量（Quadric Error Metrics）</h3>
+      <p>用蓝色三角形代替灰色多边形，如果用平均，三角形太小了，引入 二次误差度量。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/172926f77c3f40eb93cda25ff3d60353.png"  alt="在这里插入图片描述">
+      </p>
+<ul>
+<li>它用来表示曲面简化带来的误差的大小。</li>
+<li>用局部顶点做平均效果是不好的。</li>
+<li>二次误差：新的点应该使与它相关联的面的平方和达到最小。</li>
+</ul>
+
+        <h3 id="通过二次误差来进行边坍缩"   >
+          <a href="#通过二次误差来进行边坍缩" class="heading-link"><i class="fas fa-link"></i></a><a href="#通过二次误差来进行边坍缩" class="headerlink" title="通过二次误差来进行边坍缩"></a>通过二次误差来进行边坍缩</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/840fc335e5464981aabdff3fb6364175.png"  alt="在这里插入图片描述">
+      </p>
+<ul>
+<li>假设坍缩每一条边，然后分别得到它们的二次误差。 做为各自的分数。</li>
+<li>每次都折叠分数最小的边，然后更新被影响边的分数。</li>
+<li>使用贪心算法就可以得到不错的结果。</li>
+</ul>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221026/">https://fengqianye.github.io/2022/10/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221026/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/25/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221025/"><span class="paginator-prev__text">计算机图形学学习20221025</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BD%91%E6%A0%BC%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">
+          网格操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B2%E9%9D%A2%E7%BB%86%E5%88%86"><span class="toc-number">1.1.</span> <span class="toc-text">
+          曲面细分</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#loop%E7%BB%86%E5%88%86"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          loop细分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#loop%E7%BB%86%E5%88%86%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">
+          loop细分的结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Catmull-Clark%E7%BB%86%E5%88%86%EF%BC%88General-Mesh%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">
+          Catmull-Clark细分（General Mesh）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">
+          基本概念</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Catmull-Clark%E7%BB%86%E5%88%86%E7%AE%97%E6%B3%95"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">
+          Catmull-Clark细分算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E6%95%B4%E8%A7%84%E5%88%99"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">
+          调整规则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#loop%E7%BB%86%E5%88%86%E5%92%8CCatmull-Clark%E7%BB%86%E5%88%86%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="toc-number">1.1.2.4.</span> <span class="toc-text">
+          loop细分和Catmull-Clark细分的对比</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B2%E9%9D%A2%E7%AE%80%E5%8C%96"><span class="toc-number">1.2.</span> <span class="toc-text">
+          曲面简化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">
+          基本概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E6%AC%A1%E8%AF%AF%E5%B7%AE%E5%BA%A6%E9%87%8F%EF%BC%88Quadric-Error-Metrics%EF%BC%89"><span class="toc-number">1.2.2.</span> <span class="toc-text">
+          二次误差度量（Quadric Error Metrics）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E4%BA%8C%E6%AC%A1%E8%AF%AF%E5%B7%AE%E6%9D%A5%E8%BF%9B%E8%A1%8C%E8%BE%B9%E5%9D%8D%E7%BC%A9"><span class="toc-number">1.2.3.</span> <span class="toc-text">
+          通过二次误差来进行边坍缩</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">26</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>

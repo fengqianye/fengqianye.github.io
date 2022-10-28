@@ -1,0 +1,496 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/images/icons/favicon-16x16.png?v=2.7.0" type="image/png" sizes="16x16"><link rel="icon" href="/images/icons/favicon-32x32.png?v=2.7.0" type="image/png" sizes="32x32"><meta name="description" content="Shadow Mapping与光线追踪，软阴影和硬阴影，进行光线追踪（Ray Tracing），光线投射（Ray Casting），AABB包围盒，Oct-Tree 八叉树，KD-Tree，BVH加速">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机图形学学习20221028">
+<meta property="og:url" content="https://fengqianye.github.io/2022/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221028/">
+<meta property="og:site_name" content="枫玲的技术博客">
+<meta property="og:description" content="Shadow Mapping与光线追踪，软阴影和硬阴影，进行光线追踪（Ray Tracing），光线投射（Ray Casting），AABB包围盒，Oct-Tree 八叉树，KD-Tree，BVH加速">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/46d1be080f5144c08e39110f99e64a3e.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0600601f529e49cebe7fcd83df4740ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/f047a7afe5ec4c4d918ba7b9a0d8b8ef.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4c3b041276a74e8daf92c35c45649d82.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/578f6055a8914f7a8a7fbcd7cc15943a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/357601089ee547308d12338a7153b1bd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7131964982434ff984852f9d8f8d5e9c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/98180bb223d24ae59827cbe3cefaad45.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2c540c5728e743aca5d41524db42f5b4.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bc5fe0ee863a4be3a435f8d24ae002aa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e9101d8ccaf04fe89b8e680df829c0e0.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d208ba59900943b8b4c703775ad53088.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/49221deee8c24809adb086b5e086287c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3373c681015141a3a4ad3d9af6469071.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30329081b83c46899a7690ab05e1d96a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1c54d5eaf11244c7a05542bdd4907c2a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c5acf953ac224dbb80146971704b57ef.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1515e52de81e4f06a3ec1863a1a7b37f.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0ea7a3c68768409a9b500b144c0d981c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/75d9e10925274cf7b2a622892b4e48fd.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/7462ad56bb344c399e16c6305b9f54e8.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/a461c5e82e194c50a38fe42c68baaa96.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d8c0584c7d614a6c9e0ba5b83a39f997.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c040d3903df746369f1d2d5ebc57d45d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1401c0eb3c4d47728026e8c9bf4d1580.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b68b19322b1041568c19e0ec7b25d8eb.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/30e9b91ab03646ae989df84b6f9a5ad7.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9f440fede18a4416badea02190079f5c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c35f8b988d50484493cb5c63cfd41ffa.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/0376a4ded7894f2b9cdba950c97e565c.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b85ffdf2de7142169221831c330ec7ce.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9cbe0e0226f74b15a409020f43015fa3.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/ceac551670cb4fd0968ecf877b942894.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/af2114ef53024e579c426f123f6b8728.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c32d5c658e7b4fc6983a53b193f3f09a.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/9e3769e3381d4013a7b4ade734273a17.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/bbe4d2f060ae46ba9c6eb098e12ff907.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/e3fd5293067f401a9dd98bc9048391f1.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c497ea81d8fd46e0bb10b7c7e2c74c2d.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2248755ae9d342ff8880858473cf177b.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d3ca4cac1b7d4879bf3c3dac9352f098.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/c3cbcbdf10dd40309ab44e0f59318500.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/3e19be0a68b54d76b7f226368841e722.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/b4239920a16e47f498e45e0d2ca3f3cc.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/eacf184d12c341cf93c613311548f904.png">
+<meta property="article:published_time" content="2022-10-28T12:30:06.000Z">
+<meta property="article:modified_time" content="2022-10-28T12:33:49.173Z">
+<meta property="article:author" content="枫玲">
+<meta property="article:tag" content="计算机图形学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/46d1be080f5144c08e39110f99e64a3e.png"><title>计算机图形学学习20221028 | 枫玲的技术博客</title><link ref="canonical" href="https://fengqianye.github.io/2022/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221028/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.7.0"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  assistSearch: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"20px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":true},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"dark","wordWrap":false},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: {"colWidth":"220px","gapX":"10px"},
+  lazyload: true,
+  pjax: undefined,
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">枫玲的技术博客</div><div class="header-banner-info__subtitle">热爱生活和IT技术</div></div><div class="header-banner-arrow"><div class="header-banner-arrow__icon"><i class="fas fa-angle-down"></i></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">计算机图形学学习20221028</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2022-10-28</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2022-10-28</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">3.5k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">19分</span></span></div></header><div class="post-body">
+        <h1 id="Shadow-Mapping与光线追踪"   >
+          <a href="#Shadow-Mapping与光线追踪" class="heading-link"><i class="fas fa-link"></i></a><a href="#Shadow-Mapping与光线追踪" class="headerlink" title="Shadow Mapping与光线追踪"></a>Shadow Mapping与光线追踪</h1>
+      <p>Shadow Mapping本质是一种图像空间的算法，不需要知道场景的几何信息。<br><strong>关键思想</strong>：<br>不在阴影中的点必须可以同时被摄像机和光源看到。</p>
+
+        <h2 id="Shadow-Mapping步骤"   >
+          <a href="#Shadow-Mapping步骤" class="heading-link"><i class="fas fa-link"></i></a><a href="#Shadow-Mapping步骤" class="headerlink" title="Shadow Mapping步骤"></a>Shadow Mapping步骤</h2>
+      
+        <h3 id="从光源渲染"   >
+          <a href="#从光源渲染" class="heading-link"><i class="fas fa-link"></i></a><a href="#从光源渲染" class="headerlink" title="从光源渲染"></a>从光源渲染</h3>
+      <p>假设光源有个虚拟相机，从光源看向场景，做光栅化，记录深度信息的图像，生成深度图。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/46d1be080f5144c08e39110f99e64a3e.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="从摄像机渲染"   >
+          <a href="#从摄像机渲染" class="heading-link"><i class="fas fa-link"></i></a><a href="#从摄像机渲染" class="headerlink" title="从摄像机渲染"></a>从摄像机渲染</h3>
+      <p>从摄像机看场景，对于每一个看到的点，将其映射回光源渲染的深度图上，连接光源和这个点，计算点到光源的距离， <strong>比较从光源到这个看到的点的深度和其在深度图上对应的深度，若深度一致，说明这个点可以同时被光源和摄像机看到</strong>。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0600601f529e49cebe7fcd83df4740ce.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="Shadow-Mapping结果"   >
+          <a href="#Shadow-Mapping结果" class="heading-link"><i class="fas fa-link"></i></a><a href="#Shadow-Mapping结果" class="headerlink" title="Shadow Mapping结果"></a>Shadow Mapping结果</h3>
+      <p>如下图非绿色的是阴影应该在的地方<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/f047a7afe5ec4c4d918ba7b9a0d8b8ef.png"  alt="在这里插入图片描述">
+      <br>Shadow Mapping的问题：</p>
+<ul>
+<li>生成的是硬阴影（只对点光源）。</li>
+<li>阴影的效果取决于shadow map的分辨率。</li>
+<li>涉及浮点精度比较的问题。</li>
+</ul>
+
+        <h2 id="软阴影和硬阴影"   >
+          <a href="#软阴影和硬阴影" class="heading-link"><i class="fas fa-link"></i></a><a href="#软阴影和硬阴影" class="headerlink" title="软阴影和硬阴影"></a>软阴影和硬阴影</h2>
+      <p>如下图，左边是硬阴影（界限比较清晰），右边是软阴影。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/4c3b041276a74e8daf92c35c45649d82.png"  alt="在这里插入图片描述">
+      <br>软阴影的原理：由于点光源有大小，会形成如图所示的（Umbra）本影区域和半影（Penumbra）区域。所以会形成阴影的过渡。</p>
+
+        <h1 id="进行光线追踪（Ray-Tracing）的原因"   >
+          <a href="#进行光线追踪（Ray-Tracing）的原因" class="heading-link"><i class="fas fa-link"></i></a><a href="#进行光线追踪（Ray-Tracing）的原因" class="headerlink" title="进行光线追踪（Ray Tracing）的原因"></a>进行光线追踪（Ray Tracing）的原因</h1>
+      <p>光栅化不能很好的处理全局效果（如下图所示）。</p>
+<ul>
+<li>难以做软阴影。</li>
+<li>难以表现光线多次弹射，比如间接光照。</li>
+<li>光栅化很快但是质量较低</li>
+<li><strong>光线追踪很准确，但是很慢</strong>。光栅化：实时（游戏），光线追踪：离线（动画）。光线追踪一帧就要花10K个计算机小时<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/578f6055a8914f7a8a7fbcd7cc15943a.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/357601089ee547308d12338a7153b1bd.png"  alt="在这里插入图片描述">
+      </li>
+</ul>
+
+        <h2 id="光线追踪算法"   >
+          <a href="#光线追踪算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线追踪算法" class="headerlink" title="光线追踪算法"></a>光线追踪算法</h2>
+      
+        <h3 id="光线模型的假设"   >
+          <a href="#光线模型的假设" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线模型的假设" class="headerlink" title="光线模型的假设"></a>光线模型的假设</h3>
+      <ol>
+<li>光线沿直线传播。</li>
+<li>光线和光线不会发生碰撞。</li>
+<li>光线会从光源发出，打到场景中，经过反射折射等最终进入人眼（光线具有可逆性）。</li>
+<li>对于能够被相机看见的物体,可以认为相机发射出光线。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7131964982434ff984852f9d8f8d5e9c.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+
+        <h3 id="光线投射（Ray-Casting）"   >
+          <a href="#光线投射（Ray-Casting）" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线投射（Ray-Casting）" class="headerlink" title="光线投射（Ray Casting）"></a>光线投射（Ray Casting）</h3>
+      <p>光线投射是光线追踪中用于生成初始光线的第一步。</p>
+<ol>
+<li>通过从每一个像素发射光线来生成图像。</li>
+<li>通过从光源发射光线来检测阴影。</li>
+</ol>
+<p>从视点开始经过像素获得与场景中物体最近的交点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/98180bb223d24ae59827cbe3cefaad45.png"  alt="在这里插入图片描述">
+      <br>和光源连线，判断是否对光源可见从而确定该点是否在阴影中。如果物体交点到光源的线中间没有交点，则被相机和光源同时可见，交点被照亮。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2c540c5728e743aca5d41524db42f5b4.png"  alt="在这里插入图片描述">
+      <br>然后更加光源能量计算着色，写回像素结果。</p>
+
+        <h2 id="Recursive（Whitted-Style）-Ray-Tracing"   >
+          <a href="#Recursive（Whitted-Style）-Ray-Tracing" class="heading-link"><i class="fas fa-link"></i></a><a href="#Recursive（Whitted-Style）-Ray-Tracing" class="headerlink" title="Recursive（Whitted- Style） Ray Tracing"></a>Recursive（Whitted- Style） Ray Tracing</h2>
+      <p>此算法要考虑反射和折射的光线。<br>此算法在79年渲染1帧用了74min、06年PC需要6s、12年的GPU需要1&#x2F;30s。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/bc5fe0ee863a4be3a435f8d24ae002aa.png"  alt="在这里插入图片描述">
+      <br>对每一个弹射点都要计算着色的值，然后把所有着色的值都加到像素的值里面去（<strong>光线是可逆的，你在看物体的同时物体也能看到你</strong>）。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e9101d8ccaf04fe89b8e680df829c0e0.png"  alt="在这里插入图片描述">
+      <br>光线有不同的分类：primary ray、secondary ray、shadow ray。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d208ba59900943b8b4c703775ad53088.png"  alt="在这里插入图片描述">
+      <br>结果：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/49221deee8c24809adb086b5e086287c.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="光线与物体的交点-Ray-Object-intersections"   >
+          <a href="#光线与物体的交点-Ray-Object-intersections" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线与物体的交点-Ray-Object-intersections" class="headerlink" title="光线与物体的交点 Ray-Object intersections"></a>光线与物体的交点 Ray-Object intersections</h1>
+      
+        <h2 id="光线"   >
+          <a href="#光线" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线" class="headerlink" title="光线"></a>光线</h2>
+      <p>光线在数学上是有起点和方向的射线，表达式如下，t代表时间。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/3373c681015141a3a4ad3d9af6469071.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="光线与球求交"   >
+          <a href="#光线与球求交" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线与球求交" class="headerlink" title="光线与球求交"></a>光线与球求交</h2>
+      <p>光线与球的交点p，必须要满足p既在光线上也在球上。球上任意一点到球心都为半径。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/30329081b83c46899a7690ab05e1d96a.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1c54d5eaf11244c7a05542bdd4907c2a.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="光线和隐式表面求交"   >
+          <a href="#光线和隐式表面求交" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线和隐式表面求交" class="headerlink" title="光线和隐式表面求交"></a>光线和隐式表面求交</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c5acf953ac224dbb80146971704b57ef.png"  alt="在这里插入图片描述">
+      <br>解出来结果t，即可得到交点（t必须是实数，也要是正数）。</p>
+
+        <h2 id="光线和三角形面求交"   >
+          <a href="#光线和三角形面求交" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线和三角形面求交" class="headerlink" title="光线和三角形面求交"></a>光线和三角形面求交</h2>
+      <p><strong>对于显示表面与光线求交的关键是求三角形与光线求交。</strong><br>光线和三角形求交有如下作用：</p>
+<ul>
+<li>渲染：可见性、阴影、光照…</li>
+<li>几何：可以判断点是再物体内还是物体外。</li>
+<li><strong>对任何一个封闭的曲面，在内部找一个点，如果点在形状内，那么从这个点发出的任意方向的射线与此物体的交点数量一定是奇数。</strong></li>
+</ul>
+
+        <h3 id="算法（与平面求交再判断是否在三角形内）"   >
+          <a href="#算法（与平面求交再判断是否在三角形内）" class="heading-link"><i class="fas fa-link"></i></a><a href="#算法（与平面求交再判断是否在三角形内）" class="headerlink" title="算法（与平面求交再判断是否在三角形内）"></a>算法（与平面求交再判断是否在三角形内）</h3>
+      <p>简单的办法是让场景中的每个三角形与光线进行求交计算，但是有如下严重问题。</p>
+<ul>
+<li>简单但是运算量大。</li>
+<li>可以有0或1个交点。</li>
+</ul>
+<p>如果想要计算光线和三角形面的交点，<strong>因为三角形在平面内</strong>，所以可以把光线和三角形求交拆成两个问题：</p>
+<ol>
+<li>让光线与平面求交（目前与平面求交比与三角形求交容易）。</li>
+<li>判断与平面的交点是否在三角形内。</li>
+</ol>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1515e52de81e4f06a3ec1863a1a7b37f.png"  alt="在这里插入图片描述">
+      <br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0ea7a3c68768409a9b500b144c0d981c.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h3 id="Moller-Trumbore算法"   >
+          <a href="#Moller-Trumbore算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#Moller-Trumbore算法" class="headerlink" title="Moller Trumbore算法"></a>Moller Trumbore算法</h3>
+      <p>Moller Trumbore算法是一种使用<strong>重心坐标计算</strong>的一种更快的方法。在下面的式子中，左边是光线的表达式，右边是三角形上一点的重心坐标形式。</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/75d9e10925274cf7b2a622892b4e48fd.png"  alt="在这里插入图片描述">
+      <br>使用克莱默法则，如果解出b<sub>1</sub>,b<sub>2</sub>，1-b<sub>1</sub>-b<sub>2</sub>都大于0且t大于0，则说明解是有意义的，说明光线与三角形相交。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/7462ad56bb344c399e16c6305b9f54e8.png"  alt="在这里插入图片描述">
+      <br>这个图像有10.7M个三角形，对于4k的屏幕，每个像素都要发生一条光线，每条光线要计算10.7M个三角形，计算量巨大，需要做加速，解决办法包围盒。</p>
+
+        <h1 id="包围盒（Bounding-Volumes）"   >
+          <a href="#包围盒（Bounding-Volumes）" class="heading-link"><i class="fas fa-link"></i></a><a href="#包围盒（Bounding-Volumes）" class="headerlink" title="包围盒（Bounding Volumes）"></a>包围盒（Bounding Volumes）</h1>
+      <p>原始的做法是让每个像素的光线要和所有三角形面求交点，计算量太大，那么如何让这个过程加速呢？如果我们圈定包围盒，连与包围盒都不相交的三角形就不用接着算了，那么就可以很大的减少计算量。<br><strong>基本思想</strong> ：使用一个简单的几何体来包围一个复杂的物体，如果光线不饿能碰到包围盒，那么就不用再计算其与里面物体的交点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/a461c5e82e194c50a38fe42c68baaa96.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="求光线与长方体的交点"   >
+          <a href="#求光线与长方体的交点" class="heading-link"><i class="fas fa-link"></i></a><a href="#求光线与长方体的交点" class="headerlink" title="求光线与长方体的交点"></a>求光线与长方体的交点</h2>
+      <p>3D物体通常的包围盒是长方体。<br><strong>一个重要理解</strong>：长方体是三对不同的面形成的交集。<br>我们使用的包围盒通常是轴对齐（AABB）包围盒。Axis-Aligned Bounding Box(AABB)<br><strong>经过以上分析，现在问题就i变成了求光线和轴对齐包围盒的交点</strong><br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d8c0584c7d614a6c9e0ba5b83a39f997.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="求光线和轴对齐包围盒的交点"   >
+          <a href="#求光线和轴对齐包围盒的交点" class="heading-link"><i class="fas fa-link"></i></a><a href="#求光线和轴对齐包围盒的交点" class="headerlink" title="求光线和轴对齐包围盒的交点"></a>求光线和轴对齐包围盒的交点</h2>
+      
+        <h3 id="2维的情况"   >
+          <a href="#2维的情况" class="heading-link"><i class="fas fa-link"></i></a><a href="#2维的情况" class="headerlink" title="2维的情况"></a>2维的情况</h3>
+      <p>二维长方形盒子，实质是两对平行线的交叉部分，分别求光线与这两对平行线的交点，对生成的两条线段求交集，即计算t<sub>enter</sub>&#x3D;max{t<sub>min</sub>},t<sub>exit</sub>&#x3D;min{t<sub>max</sub>},具体过程如下：<br>先计算二维的长方形。由于前面提到的光线方程是参数方程，所以只要我们计算光线什么时候会和一对平行的边有交点，就可以求出光线进入和离开这个边的时间。<br>因为一个长方形有两对边，所以会得到两对解，然后求这两对解的交集，t<sub>min</sub>，t<sub>max</sub>就分别代表着光线进入和离开长方体的时间<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c040d3903df746369f1d2d5ebc57d45d.png"  alt="在这里插入图片描述">
+      <br>简单理解就是进入了所有的边才叫进入，出去了一个边就离开了，下面三维的情况也是同样如此。</p>
+
+        <h3 id="3维的情况"   >
+          <a href="#3维的情况" class="heading-link"><i class="fas fa-link"></i></a><a href="#3维的情况" class="headerlink" title="3维的情况"></a>3维的情况</h3>
+      <p><strong>根据2维的结果，我们观察发现：</strong></p>
+<ol>
+<li>只有当光线进入了所有的对面，才能说光线进入了盒子。</li>
+<li>只要光线离开任意一个对面，光线就离开了盒子。dcscdsdcdscccccccccccccccccccccc<br>三维立方体是三对平面相交的部分，光线求交推广到三维,则是光线与三对平面分别求进入和出去的时间t,并将这三组t时间求交，最后判断光线是否与盒子相交。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/1401c0eb3c4d47728026e8c9bf4d1580.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+<p><strong>计算t<sub>enter</sub>(光线进入物体时的t)与t<sub>exit</sub>(光线离开物体时的t)：</strong></p>
+<ol>
+<li>计算每个面的t<sub>min</sub>，t<sub>max</sub></li>
+<li>对于3D盒子，得到光线进入盒子和离开盒子的时间,即计算t<sub>enter</sub>&#x3D;max{t<sub>min</sub>},t<sub>exit</sub>&#x3D;min{t<sub>max</sub>}</li>
+<li>如果t<sub>enter</sub>&lt;t<sub>exit</sub>就说明光线与盒子有交点。</li>
+<li>t为负时的意义:如果t<sub>exit</sub>&lt;0,说明盒子在光线背后，说明没有交点。如果t<sub>exit</sub>&gt;&#x3D;0并且t<sub>enter</sub>&lt;0,说明光线的起点在盒子里，一定有交点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b68b19322b1041568c19e0ec7b25d8eb.png"  alt="在这里插入图片描述">
+      </li>
+</ol>
+<p><strong>结论:</strong><br>如果满足t<sub>enter</sub>&lt;t<sub>exit</sub>且t<sub>exit</sub>&gt;&#x3D;0,则说明光线与AABB包围盒有交点。</p>
+
+        <h2 id="使用轴对齐-AABB-概念的原因"   >
+          <a href="#使用轴对齐-AABB-概念的原因" class="heading-link"><i class="fas fa-link"></i></a><a href="#使用轴对齐-AABB-概念的原因" class="headerlink" title="使用轴对齐(AABB)概念的原因"></a>使用轴对齐(AABB)概念的原因</h2>
+      <p>主要目的是简化计算。轴对齐的情况下计算t（只需要考虑各方向的分量即可）：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/30e9b91ab03646ae989df84b6f9a5ad7.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="Uniform-Spatial-Partitions-（Grids）均匀空间划分"   >
+          <a href="#Uniform-Spatial-Partitions-（Grids）均匀空间划分" class="heading-link"><i class="fas fa-link"></i></a><a href="#Uniform-Spatial-Partitions-（Grids）均匀空间划分" class="headerlink" title="Uniform Spatial Partitions （Grids）均匀空间划分"></a>Uniform Spatial Partitions （Grids）均匀空间划分</h1>
+      
+        <h2 id="建立加速格子"   >
+          <a href="#建立加速格子" class="heading-link"><i class="fas fa-link"></i></a><a href="#建立加速格子" class="headerlink" title="建立加速格子"></a>建立加速格子</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9f440fede18a4416badea02190079f5c.png"  alt="在这里插入图片描述">
+      </p>
+<ol>
+<li>找到包围盒</li>
+<li>创建格子</li>
+<li>标记与物体相交的格子</li>
+</ol>
+
+        <h2 id="光线与场景求交点"   >
+          <a href="#光线与场景求交点" class="heading-link"><i class="fas fa-link"></i></a><a href="#光线与场景求交点" class="headerlink" title="光线与场景求交点"></a>光线与场景求交点</h2>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c35f8b988d50484493cb5c63cfd41ffa.png"  alt="在这里插入图片描述">
+      </p>
+<ol>
+<li>按照光线穿梭的顺序遍历格子</li>
+<li>对于每个格子，如果盒子格子里有物体，计算存储在格子里的所有物体是否与光线有交点。</li>
+</ol>
+
+        <h2 id="加速效果"   >
+          <a href="#加速效果" class="heading-link"><i class="fas fa-link"></i></a><a href="#加速效果" class="headerlink" title="加速效果"></a>加速效果</h2>
+      <p>格子太多和格子太少都是不好的。只有一个格子：没有加速效果格子。特别密集：需要做很多光线与格子求交，加大开销。<br>即想要获得比较好的加速效果，格子不能太稀疏，也不能太密集。下面是人们经验得到的规律。</p>
+<ol>
+<li>#cells &#x3D; C * #objs。格子的数量是物体的数量乘以常数</li>
+<li>C ≈ 27 in 3D</li>
+</ol>
+<p>格子划分法适用于大小和空间均匀分布的大型对象集合（如下图所示）。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/0376a4ded7894f2b9cdba950c97e565c.png"  alt="在这里插入图片描述">
+      <br>但是此方法不适合于有很多空旷区域的场景（如下图所示），下面又称为“teapot in stadium”问题。teapot in stadium是指如果在空旷的操场放置一个茶壶<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b85ffdf2de7142169221831c330ec7ce.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h1 id="空间划分（Spatial-Partitions）"   >
+          <a href="#空间划分（Spatial-Partitions）" class="heading-link"><i class="fas fa-link"></i></a><a href="#空间划分（Spatial-Partitions）" class="headerlink" title="空间划分（Spatial Partitions）"></a>空间划分（Spatial Partitions）</h1>
+      <p>把空间划分成不重叠的区域。一个物体可能呗包含在多个区域中。</p>
+
+        <h2 id="空间划分的例子"   >
+          <a href="#空间划分的例子" class="heading-link"><i class="fas fa-link"></i></a><a href="#空间划分的例子" class="headerlink" title="空间划分的例子"></a>空间划分的例子</h2>
+      <ul>
+<li><strong>Oct-Tree 八叉树</strong> 把场景包起来，然后把正方体切成八份，横竖割一刀，上下一刀，可以分为八块，二维对应4叉树，一维二叉树。不断的对子节点递归进行此过程，放格子里面是空的或者物体足够少就停下来。（但是有个严重的问题，随着维度的升高，节点数量指数型增长）</li>
+<li><strong>KD-Tree</strong> 与八叉树几乎相同，但是对每次划分的格子，总是沿着<strong>某一个轴切割</strong>（通常是交替的），且对每个格子仅切割一次。（好处是相比于八叉树，节点数量的复杂度不会随着维度指数型增长。）</li>
+<li><strong>BSP-Tree 对空间二分</strong>，每次划分时选择一个方向，与KD-Tree的区别在于它的<strong>切割不一定是与轴平行的</strong>。（存在的问题是在<strong>维度高的时候不好计算</strong>，切割的几何体，根据几何体的维度，切割的几何体从点到线到面到超平面。）</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9cbe0e0226f74b15a409020f43015fa3.png"  alt="在这里插入图片描述">
+      </p>
+
+        <h2 id="KD-Tree"   >
+          <a href="#KD-Tree" class="heading-link"><i class="fas fa-link"></i></a><a href="#KD-Tree" class="headerlink" title="KD-Tree"></a>KD-Tree</h2>
+      <p>建立空间划分在光线追踪之前。<br>总体来说是一颗二叉树，如下图所示（为了简化没画全，实际上1、2等节点都有子节点）。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/ceac551670cb4fd0968ecf877b942894.png"  alt="在这里插入图片描述">
+      <br>对于非叶子节点：</p>
+<ul>
+<li>划分的轴：x、y或z轴。</li>
+<li>划分的位置：分割的平面沿轴的坐标。</li>
+<li>子节点：一定有两个子节点。</li>
+<li><strong>在非叶子节点不会存储物体。</strong></li>
+<li>对于叶子节点存储物体列表。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/af2114ef53024e579c426f123f6b8728.png"  alt="在这里插入图片描述">
+      </li>
+</ul>
+
+        <h3 id="计算光线与物体交点的步骤"   >
+          <a href="#计算光线与物体交点的步骤" class="heading-link"><i class="fas fa-link"></i></a><a href="#计算光线与物体交点的步骤" class="headerlink" title="计算光线与物体交点的步骤"></a>计算光线与物体交点的步骤</h3>
+      <p>首先和最大的包围盒A求交，有交点说明光线与其子节点有交点，访问其孩子节点：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c32d5c658e7b4fc6983a53b193f3f09a.png"  alt="在这里插入图片描述">
+      找到叶子节点1，与区域内的所有物体求交。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/9e3769e3381d4013a7b4ade734273a17.png"  alt="在这里插入图片描述">
+      <br>光线与B包围盒求交，有交点说明光线与其子节点有交点，访问其孩子节点：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/bbe4d2f060ae46ba9c6eb098e12ff907.png"  alt="在这里插入图片描述">
+      找到叶子节点2，与区域内的所有物体求交。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/e3fd5293067f401a9dd98bc9048391f1.png"  alt="在这里插入图片描述">
+      <br>光线与C包围盒求交，有交点说明光线与其子节点有交点,访问其孩子节点：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c497ea81d8fd46e0bb10b7c7e2c74c2d.png"  alt="在这里插入图片描述">
+      <br>找到叶子节点3，与区域内的所有物体求交。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/2248755ae9d342ff8880858473cf177b.png"  alt="在这里插入图片描述">
+      <br>光线与D包围盒求交，有交点说明光线与其子节点有交点,访问其孩子节点：<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/d3ca4cac1b7d4879bf3c3dac9352f098.png"  alt="在这里插入图片描述">
+      <br>KD-Tree的问题:</p>
+<ol>
+<li>很难判断物体的三角形和AABB包围盒是否有交集。</li>
+<li>一个物体可能会与很多AABB包围盒有交集。即一个物体可能存储在多个叶子节点里</li>
+</ol>
+<p>引入物体划分避免上述的问题。</p>
+
+        <h1 id="物体划分"   >
+          <a href="#物体划分" class="heading-link"><i class="fas fa-link"></i></a><a href="#物体划分" class="headerlink" title="物体划分"></a>物体划分</h1>
+      <p>把物体划分成不相交的子集。每个子集的包围盒在空间上可能是重叠的。</p>
+
+        <h2 id="与BVH加速结构（Object-Partition-amp-Bounding-Volume-Hierarchy）"   >
+          <a href="#与BVH加速结构（Object-Partition-amp-Bounding-Volume-Hierarchy）" class="heading-link"><i class="fas fa-link"></i></a><a href="#与BVH加速结构（Object-Partition-amp-Bounding-Volume-Hierarchy）" class="headerlink" title="与BVH加速结构（Object Partition &amp; Bounding Volume Hierarchy）"></a>与BVH加速结构（Object Partition &amp; Bounding Volume Hierarchy）</h2>
+      <p>建立过程:</p>
+<ol>
+<li>找到包围盒</li>
+<li>递归的把物体集合划分成两个子集</li>
+<li>重新计算子集的包围盒</li>
+<li>当满足一定要求的时候停止</li>
+<li>在每个叶子节点里存储所有物体</li>
+</ol>
+<p>首先对于所有物体找到包围盒，形成根节点<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/c3cbcbdf10dd40309ab44e0f59318500.png"  alt="在这里插入图片描述">
+      <br>然后把物体分成两部分，并重新计算包围盒，形成根节点的子节点。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/3e19be0a68b54d76b7f226368841e722.png"  alt="在这里插入图片描述">
+      <br>不断的递归重复这个过程，直达满足一定的条件后停止，最后在叶子节点存储物体列表。<br>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/b4239920a16e47f498e45e0d2ca3f3cc.png"  alt="在这里插入图片描述">
+      <br>BVH的优缺点：<br>BVH避免了KD-Tree的问题，具有如下优点。</p>
+<ul>
+<li>一个物体只能出现在一个格子里。</li>
+<li>不涉及三角形和包围盒求交的问题。</li>
+<li>BVH并没有把空间严格的划分开（包围盒有可能相交）。</li>
+</ul>
+
+        <h3 id="建立中的细节问题"   >
+          <a href="#建立中的细节问题" class="heading-link"><i class="fas fa-link"></i></a><a href="#建立中的细节问题" class="headerlink" title="建立中的细节问题"></a>建立中的细节问题</h3>
+      <p><strong>如何划分节点？</strong><br>每次都需要选择一个维度来分割（经验上有下面两种做法），使树接近平衡。</p>
+<ul>
+<li>选择节点中最长的轴。比如长长条形的物体。</li>
+<li>取中间的物体的位置来划分节点。</li>
+</ul>
+<p><strong>划分终止条件？</strong><br>当节点包含少于特定元素时停止（比如5）。</p>
+<p><strong>BVH树的存储结构?</strong></p>
+<ul>
+<li>中间节点存储包围盒和子节点的指针。</li>
+<li>叶子节点存储包围盒和物体列表。</li>
+<li>节点代表场景中图元（primitives）的子集，所有物体都在子树中。</li>
+</ul>
+
+        <h3 id="BVH算法"   >
+          <a href="#BVH算法" class="heading-link"><i class="fas fa-link"></i></a><a href="#BVH算法" class="headerlink" title="BVH算法"></a>BVH算法</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://img-blog.csdnimg.cn/eacf184d12c341cf93c613311548f904.png"  alt="在这里插入图片描述">
+      </p>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://fengqianye.github.io">枫玲</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://fengqianye.github.io/2022/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221028/">https://fengqianye.github.io/2022/10/28/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221028/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://fengqianye.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2022/10/26/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%AD%A6%E4%B9%A020221026/"><span class="paginator-prev__text">计算机图形学学习20221026</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Shadow-Mapping%E4%B8%8E%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA"><span class="toc-number">1.</span> <span class="toc-text">
+          Shadow Mapping与光线追踪</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shadow-Mapping%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.1.</span> <span class="toc-text">
+          Shadow Mapping步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E5%85%89%E6%BA%90%E6%B8%B2%E6%9F%93"><span class="toc-number">1.1.1.</span> <span class="toc-text">
+          从光源渲染</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8E%E6%91%84%E5%83%8F%E6%9C%BA%E6%B8%B2%E6%9F%93"><span class="toc-number">1.1.2.</span> <span class="toc-text">
+          从摄像机渲染</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Shadow-Mapping%E7%BB%93%E6%9E%9C"><span class="toc-number">1.1.3.</span> <span class="toc-text">
+          Shadow Mapping结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AF%E9%98%B4%E5%BD%B1%E5%92%8C%E7%A1%AC%E9%98%B4%E5%BD%B1"><span class="toc-number">1.2.</span> <span class="toc-text">
+          软阴影和硬阴影</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8C%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%EF%BC%88Ray-Tracing%EF%BC%89%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="toc-number">2.</span> <span class="toc-text">
+          进行光线追踪（Ray Tracing）的原因</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E8%BF%BD%E8%B8%AA%E7%AE%97%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">
+          光线追踪算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%81%87%E8%AE%BE"><span class="toc-number">2.1.1.</span> <span class="toc-text">
+          光线模型的假设</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E6%8A%95%E5%B0%84%EF%BC%88Ray-Casting%EF%BC%89"><span class="toc-number">2.1.2.</span> <span class="toc-text">
+          光线投射（Ray Casting）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Recursive%EF%BC%88Whitted-Style%EF%BC%89-Ray-Tracing"><span class="toc-number">2.2.</span> <span class="toc-text">
+          Recursive（Whitted- Style） Ray Tracing</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E7%89%A9%E4%BD%93%E7%9A%84%E4%BA%A4%E7%82%B9-Ray-Object-intersections"><span class="toc-number">3.</span> <span class="toc-text">
+          光线与物体的交点 Ray-Object intersections</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF"><span class="toc-number">3.1.</span> <span class="toc-text">
+          光线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E7%90%83%E6%B1%82%E4%BA%A4"><span class="toc-number">3.2.</span> <span class="toc-text">
+          光线与球求交</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E5%92%8C%E9%9A%90%E5%BC%8F%E8%A1%A8%E9%9D%A2%E6%B1%82%E4%BA%A4"><span class="toc-number">3.3.</span> <span class="toc-text">
+          光线和隐式表面求交</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E5%92%8C%E4%B8%89%E8%A7%92%E5%BD%A2%E9%9D%A2%E6%B1%82%E4%BA%A4"><span class="toc-number">3.4.</span> <span class="toc-text">
+          光线和三角形面求交</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8E%E5%B9%B3%E9%9D%A2%E6%B1%82%E4%BA%A4%E5%86%8D%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%9C%A8%E4%B8%89%E8%A7%92%E5%BD%A2%E5%86%85%EF%BC%89"><span class="toc-number">3.4.1.</span> <span class="toc-text">
+          算法（与平面求交再判断是否在三角形内）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Moller-Trumbore%E7%AE%97%E6%B3%95"><span class="toc-number">3.4.2.</span> <span class="toc-text">
+          Moller Trumbore算法</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8C%85%E5%9B%B4%E7%9B%92%EF%BC%88Bounding-Volumes%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">
+          包围盒（Bounding Volumes）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B1%82%E5%85%89%E7%BA%BF%E4%B8%8E%E9%95%BF%E6%96%B9%E4%BD%93%E7%9A%84%E4%BA%A4%E7%82%B9"><span class="toc-number">4.1.</span> <span class="toc-text">
+          求光线与长方体的交点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B1%82%E5%85%89%E7%BA%BF%E5%92%8C%E8%BD%B4%E5%AF%B9%E9%BD%90%E5%8C%85%E5%9B%B4%E7%9B%92%E7%9A%84%E4%BA%A4%E7%82%B9"><span class="toc-number">4.2.</span> <span class="toc-text">
+          求光线和轴对齐包围盒的交点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E7%BB%B4%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">4.2.1.</span> <span class="toc-text">
+          2维的情况</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E7%BB%B4%E7%9A%84%E6%83%85%E5%86%B5"><span class="toc-number">4.2.2.</span> <span class="toc-text">
+          3维的情况</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%BD%B4%E5%AF%B9%E9%BD%90-AABB-%E6%A6%82%E5%BF%B5%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="toc-number">4.3.</span> <span class="toc-text">
+          使用轴对齐(AABB)概念的原因</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Uniform-Spatial-Partitions-%EF%BC%88Grids%EF%BC%89%E5%9D%87%E5%8C%80%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86"><span class="toc-number">5.</span> <span class="toc-text">
+          Uniform Spatial Partitions （Grids）均匀空间划分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E5%8A%A0%E9%80%9F%E6%A0%BC%E5%AD%90"><span class="toc-number">5.1.</span> <span class="toc-text">
+          建立加速格子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%89%E7%BA%BF%E4%B8%8E%E5%9C%BA%E6%99%AF%E6%B1%82%E4%BA%A4%E7%82%B9"><span class="toc-number">5.2.</span> <span class="toc-text">
+          光线与场景求交点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E9%80%9F%E6%95%88%E6%9E%9C"><span class="toc-number">5.3.</span> <span class="toc-text">
+          加速效果</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86%EF%BC%88Spatial-Partitions%EF%BC%89"><span class="toc-number">6.</span> <span class="toc-text">
+          空间划分（Spatial Partitions）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A9%BA%E9%97%B4%E5%88%92%E5%88%86%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="toc-number">6.1.</span> <span class="toc-text">
+          空间划分的例子</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#KD-Tree"><span class="toc-number">6.2.</span> <span class="toc-text">
+          KD-Tree</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E5%85%89%E7%BA%BF%E4%B8%8E%E7%89%A9%E4%BD%93%E4%BA%A4%E7%82%B9%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="toc-number">6.2.1.</span> <span class="toc-text">
+          计算光线与物体交点的步骤</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%A9%E4%BD%93%E5%88%92%E5%88%86"><span class="toc-number">7.</span> <span class="toc-text">
+          物体划分</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8EBVH%E5%8A%A0%E9%80%9F%E7%BB%93%E6%9E%84%EF%BC%88Object-Partition-amp-Bounding-Volume-Hierarchy%EF%BC%89"><span class="toc-number">7.1.</span> <span class="toc-text">
+          与BVH加速结构（Object Partition &amp; Bounding Volume Hierarchy）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E4%B8%AD%E7%9A%84%E7%BB%86%E8%8A%82%E9%97%AE%E9%A2%98"><span class="toc-number">7.1.1.</span> <span class="toc-text">
+          建立中的细节问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BVH%E7%AE%97%E6%B3%95"><span class="toc-number">7.1.2.</span> <span class="toc-text">
+          BVH算法</span></a></li></ol></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">学海无涯</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/fengqianye/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a><a class="sidebar-ov-social-item" href="1692413708" target="_blank" rel="noopener" data-popover="QQ" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-qq"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">27</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">20</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">9</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span><span class="sidebar-reading-info__perc">%</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2022</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>枫玲</span></div><div></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="/js/utils.js?v=2.7.0"></script><script src="/js/stun-boot.js?v=2.7.0"></script><script src="/js/scroll.js?v=2.7.0"></script><script src="/js/header.js?v=2.7.0"></script><script src="/js/sidebar.js?v=2.7.0"></script></body></html>
